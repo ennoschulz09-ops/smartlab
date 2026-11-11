@@ -38,6 +38,14 @@ Alles muss kostenlos sein. Folgen:
 - **Die Recherche über Firecrawl verbraucht Credits** (bisher ca. 78). Weitere Recherche nur gezielt und nach Rücksprache.
 - Jede neue Szene wird zur wiederverwendbaren Vorlage, damit Video für Video weniger Aufwand entsteht.
 
+## 1d. Richtungswechsel nach Sichtung des Vorbild-Videos (siehe 04-visueller-stil.md)
+
+Das Video ist **3D plus Erklär-Grafik**, nicht 2D-Cartoon. Wir bauen deshalb:
+- **3D-Szenen mit three.js** (kostenlos im Browser, `tools3d/`) für Handlungsszenen,
+- **2D-Erklär-Grafik mit Skia** (`tools/`) für Regeln, Zähler, Diagramme,
+- **eine Figur im Prinzip "Kugelkopf mit minimalem Gesicht"**, aber mit eigenem Aussehen.
+Das Skript bekommt eine Bildspalte: **Eine Aussage = ein Motiv.**
+
 ## 2. Themenformel (aus den Hits)
 
 Hits = **Du bekommst eine Fähigkeit oder siehst einen versteckten Wert** + **sozialer Einsatz** (Vertrauen, Ruf, Freundschaft).
