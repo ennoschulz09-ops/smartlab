@@ -26,6 +26,18 @@ Die Nische ist überflutet: Kopien ohne Unterschied bekommen meist unter 1.000 V
 
 Deutsch bleibt zunächst zurückgestellt (die deutschsprachigen Treffer haben fast alle unter 1.100 Views).
 
+## 1c. Kostenlos-Regel (Entscheidung des Kanalbetreibers)
+
+Alles muss kostenlos sein. Folgen:
+
+- **Keine bezahlten KI-Bild-/Videotools.** Das verbundene Higgsfield-Konto hat nur 1,38 Credits, es wird nicht genutzt.
+- **Eigene Figuren per Code** statt KI-Bilder (siehe `tools/`). Vorteil: Die Figur sieht in jedem Bild gleich aus, und Bild-Fehler wie "he's bald" bei "copying your haircut" lassen sich vermeiden.
+- **Stimme:** kostenlose KI-Stimme (Kokoro, offline) oder die eigene Stimme.
+- **Schnitt (optional, falls wir nachbessern):** DaVinci Resolve (kostenlos) oder CapCut (Gratis-Funktionen prüfen).
+- **Thumbnails:** per Code oder Canva (kostenloser Tarif).
+- **Die Recherche über Firecrawl verbraucht Credits** (bisher ca. 78). Weitere Recherche nur gezielt und nach Rücksprache.
+- Jede neue Szene wird zur wiederverwendbaren Vorlage, damit Video für Video weniger Aufwand entsteht.
+
 ## 2. Themenformel (aus den Hits)
 
 Hits = **Du bekommst eine Fähigkeit oder siehst einen versteckten Wert** + **sozialer Einsatz** (Vertrauen, Ruf, Freundschaft).
