@@ -1,38 +1,44 @@
-# Kostenlose Produktions-Pipeline
+# Kostenlose Produktions-Pipeline (Version 2)
 
-Alles hier läuft ohne Abo und ohne Credits: Python, Pillow, ffmpeg, eine offline laufende KI-Stimme.
+Alles läuft ohne Abo und ohne Credits: Python, Skia (Zeichnen), ffmpeg, offline laufende KI-Stimme, selbst erzeugte Musik und Soundeffekte.
 
-## Bestandteile
+## Dateien
 
-| Teil | Datei | Kosten |
-|---|---|---|
-| Stimme (Kokoro, offline) | `wi_tts.py` | 0 (Modell ca. 320 MB, einmaliger Download) |
-| Figuren, Bühne, Glocke, Kamerafahrt | `wi_draw.py` | 0 |
-| Beispielszene aus Skript 01 | `poc_video.py` | 0 |
-| Thumbnail | `poc_thumbnail.py` | 0 |
+| Datei | Aufgabe |
+|---|---|
+| `gfx.py` | Zeichen-Grundlagen (Verläufe, Schatten, Glow, Text mit Umrandung, Animationskurven) |
+| `chars.py` | Figuren-Rig: Kugel-Licht am Kopf, Hoodie/Anzug mit Falten, Handschuhe, Gesicht (Augenbrauen, Lider, Mund-Formen), IK für Arme |
+| `scenes.py` | Hintergründe (Autohaus, Tiefsee), Auto, Glocke, Schallwellen, Preisschild, Stempel, Effekte |
+| `audio.py` | Stimme (Kokoro v1.0, 54 Stimmen), Soundeffekte, Musik, Abmischung mit Absenken der Musik unter der Stimme |
+| `make_clip.py` | Beispielszene aus Skript 01 (Zeitplan, Einstellungen, Lippenbewegung, Kamerafahrten) |
+| `thumb.py` | Thumbnail |
+| `voices_sampler.py` | Hörprobe mit mehreren Stimmen |
 
 ## Einrichtung
 
 ```bash
-pip install "sherpa-onnx<2.0" numpy pillow
-sudo apt-get install ffmpeg          # oder ffmpeg.org
-curl -L -o kokoro.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-en-v0_19.tar.bz2
-tar xjf kokoro.tar.bz2
-export KOKORO_DIR=$PWD/kokoro-en-v0_19
-python3 poc_thumbnail.py thumbnail.png
-python3 poc_video.py szene.mp4
+pip install "sherpa-onnx<2.0" numpy scipy pillow skia-python font-fredoka-one
+sudo apt-get install ffmpeg libegl1 libgl1      # nur Linux; Windows/Mac brauchen das nicht
+curl -L -o kokoro.tar.bz2 https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/kokoro-multi-lang-v1_0.tar.bz2
+tar xjf kokoro.tar.bz2                          # ca. 350 MB, einmalig
+export KOKORO_V1_DIR=$PWD/kokoro-multi-lang-v1_0
+
+python3 voices_sampler.py stimmen.wav           # Hörprobe, um Stimmen zu vergleichen
+python3 thumb.py thumbnail.png
+python3 make_clip.py clip.mp4 am_michael am_onyx am_puck   # Erzähler, Verkäufer, Pip
 ```
 
-Hinweis: `sherpa-onnx` muss unter Version 2.0 bleiben, sonst fehlt der eingebaute Aussprache-Teil für Kokoro.
-Als Schrift dient Inter ExtraBold (unter `/usr/share/fonts/opentype/inter/`). Auf anderen Systemen den Pfad `FONT` in `wi_draw.py` anpassen.
+`sherpa-onnx` muss unter Version 2.0 bleiben, sonst fehlt der eingebaute Aussprache-Teil.
 
-## Geschwindigkeit (gemessen, 4 CPU-Kerne)
+## Messwerte (4 CPU-Kerne)
 
-- Stimme: ca. 0,5-fache Echtzeit (10 Minuten Sprache brauchen etwa 5 Minuten).
-- Video: ca. 3,6-fache Echtzeit (die 15,5-Sekunden-Szene brauchte 56 Sekunden, ein 10-Minuten-Video wäre etwa 35 Minuten).
+- Die 19,4-Sekunden-Szene (Stimme, Musik, Effekte, 466 Bilder) brauchte 41 Sekunden: etwa 2-fache Echtzeit. Ein 10-Minuten-Video wären ca. 20 bis 25 Minuten.
+- Erzähltempo: ca. 170 bis 180 Wörter pro Minute (Vorbild: ca. 173).
+- Lautheit des Beispielclips: ca. -16 LUFS, Spitzenpegel -1,3 dBFS.
 
-## Grenzen (ehrlich)
+## Grenzen
 
-- Die Stimme klingt gut verständlich, aber weniger lebendig als bezahlte Dienste. Eigene Aufnahme oder die kostenlosen Stimmen in CapCut sind Alternativen.
-- Der größte Aufwand pro Video ist nicht das Rendern, sondern die **Bild-Bibliothek**: Figuren in verschiedenen Posen, Orte, Gegenstände. Sie wächst mit jedem Video und wird danach wiederverwendet.
-- Lizenzen der Bestandteile (Kokoro-Modell, sherpa-onnx, Inter) vor der Monetarisierung auf der jeweiligen Projektseite prüfen.
+- Ich kann die Tonqualität nicht hören, nur messen. Die Stimmwahl muss ein Mensch treffen.
+- Kokoro ist eine gute freie Stimme, aber weniger ausdrucksstark als bezahlte Dienste.
+- Die Bild-Bibliothek (Figuren-Posen, Orte, Requisiten) wächst mit jedem Video. Das ist der Hauptaufwand.
+- Lizenzen (Kokoro, sherpa-onnx, Fredoka One) vor der Monetarisierung auf den Projektseiten prüfen.
