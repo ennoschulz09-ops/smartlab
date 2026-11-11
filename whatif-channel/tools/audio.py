@@ -134,6 +134,14 @@ def gulp(gain=0.5):
     return (np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 9) * np.minimum(1, t / 0.01) * gain).astype(np.float32)
 
 
+def step(gain=0.35, seed=3):
+    """Weicher Schritt: kurzer, tiefpassgefilterter Aufprall."""
+    n = int(SR * 0.11); t = np.arange(n) / SR
+    y = signal.sosfilt(signal.butter(2, 700, "lowpass", fs=SR, output="sos"), _noise(0.11, seed)) * np.exp(-t * 38)
+    y += np.sin(2 * np.pi * 95 * t) * np.exp(-t * 30) * 0.8
+    return (y / (np.abs(y).max() + 1e-9) * gain).astype(np.float32)
+
+
 def coin_down(gain=0.45):
     """Fallender Preis: abwaerts laufende Toene."""
     out = np.zeros(int(SR * 0.7), dtype=np.float32)

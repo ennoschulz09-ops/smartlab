@@ -11,7 +11,8 @@ Alles läuft ohne Abo: three.js im vorinstallierten Chromium (ohne Grafikkarte),
 | `world.html` | 3D-Welt: Glocken-Bühne, Autohof (Autos, Gebäude, Lichterkette), Papier-Requisit, 5 Einstellungen, Licht, Tiefenunschärfe, Bloom, Farbkorrektur |
 | `render.cjs` | Rendert die 3D-Bilder einzeln (Chromium) und gibt Kopf-Positionen auf dem Bild zurück |
 | `explainer.py` | 2D-Erklärgrafik (Gitter, Regeln, Pillen, Sprechblasen, Zifferblatt-Symbol, Schlusskarte mit Abonnieren-Knopf) |
-| `make_video.py` | Zeitplan, Stimmen, Musik, Effekte, Lippenbewegung, Zusammenbau, Export |
+| `make_video.py` | (alt) erstes Beispiel mit mehreren Stimmen |
+| `make_pilot.py` | **Pilot**: nur Erzählerstimme, Zeitplan, goldene Stunde, Sprechblasen, Beschriftungen, Titelkarte, Musik, Effekte, Nachgrading, Export |
 
 ## Einrichtung
 
@@ -35,3 +36,16 @@ KOKORO_V1_DIR=/pfad/kokoro-multi-lang-v1_0 python3 make_video.py beispiel.mp4 am
 - Die Stimme (Kokoro) und die Musik habe ich nicht gehört, nur gemessen.
 - Es gibt erst 5 Einstellungen und 1 Figurenpaar. Die Bibliothek (Orte, Requisiten, Posen) wächst mit jedem Video.
 - Das Kameraspiel ist einfach (langsame Fahrten), keine Handkamera-Schnitte wie beim Vorbild.
+
+
+## Pilot (Stand v4)
+
+```bash
+KOKORO_V1_DIR=/pfad/kokoro-multi-lang-v1_0 python3 make_pilot.py pilot.mp4 am_eric
+# optional jugendlicher: PITCH_SHIFT=2 ...   (Halbtöne höher)
+# nur Ton/Beschriftung/Grading neu (3D bleibt):   ... --reuse   (gleiches WORK-Verzeichnis)
+```
+
+- Shotliste: `../06-shotliste-pilot.md`. Pip ist in jedem Bild.
+- Stimme ist per Parameter wählbar, die Hörprobe dazu: `../tools/voices_sampler2.py`.
+- Messwerte: 3D 638 Bilder in ca. 616 s, Rest ca. 2 Minuten.
