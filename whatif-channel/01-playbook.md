@@ -13,6 +13,19 @@ Basis: Analyse von @JeremyBearimyTheory (30 Uploads, Stand 11.11.2026). Wir übe
 | Figur | Eigenes Maskottchen, klar anders als eine weiße Kugelfigur | Wiedererkennung, kein Plagiat |
 | Namen | Arbeitstitel "WhatIf Lab" (Verfügbarkeit prüfen!) | Platzhalter |
 
+## 1b. Update nach der Marktanalyse (siehe 03-marktanalyse.md)
+
+Die Nische ist überflutet: Kopien ohne Unterschied bekommen meist unter 1.000 Views. Deshalb ergänzen wir:
+
+1. **Eigenes Universum:** Eine wiederkehrende Organisation/Figur verbindet die Videos (Arbeitstitel "The Bureau of Ifs" o. Ä., noch zu prüfen). Cliffhanger und "Teil 2" bei starken Videos.
+2. **Emotionaler Kern:** Jedes Skript endet mit einer Beziehung, die zählt.
+3. **Fachwinkel Natur/Berge/Winter:** Echte Wissenschaft (Lawinen, Wetter, Physik) als Alleinstellungsmerkmal und Brücke zu Avalanche Riders.
+4. **Drei Hook-Typen testen:** Mitten in der Szene, Flash-forward mit Zeitbombe, Eskalation mit Uhr.
+5. **Handwerk:** manuelle englische Untertitel, individuelle Beschreibung, 3 Titel-/Thumbnail-Varianten pro Idee.
+6. **Launch:** erst 6 bis 8 Videos produzieren, dann 3 am Starttag veröffentlichen, damit der Kanal nicht leer wirkt.
+
+Deutsch bleibt zunächst zurückgestellt (die deutschsprachigen Treffer haben fast alle unter 1.100 Views).
+
 ## 2. Themenformel (aus den Hits)
 
 Hits = **Du bekommst eine Fähigkeit oder siehst einen versteckten Wert** + **sozialer Einsatz** (Vertrauen, Ruf, Freundschaft).
