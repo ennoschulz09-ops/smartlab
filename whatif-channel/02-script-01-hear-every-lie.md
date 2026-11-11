@@ -307,9 +307,11 @@ And you hold her until she falls asleep.
 
 ## [OUTRO 10:00]
 
-So, would you want to hear every lie? Even the small ones, like "I love the sweater"?
+Would you want to hear every lie? Even the small ones, like "I love the sweater"?
 
-Tell us in the comments. And if you'd have asked that question at the council meeting, hit like and subscribe for the next what-if.
+Maybe the real question is this: which lie would you miss the most?
+
+Tell us below. The next "if" is already waiting.
 
 ---
 
