@@ -48,5 +48,5 @@ KOKORO_V1_DIR=/pfad/kokoro-multi-lang-v1_0 python3 make_pilot.py pilot.mp4 am_er
 ```
 
 - Shotliste: `../06-shotliste-pilot.md`. Pip ist in jedem Bild.
-- Stimme ist per Parameter wählbar, die Hörprobe dazu: `../tools/voices_sampler2.py`.
+- Stimme per Parameter wählbar (gewählt: Stimme 4 = `am_puck`), Hörprobe: `../tools/voices_sampler2.py`. Tempo-Kalibrierung auf ca. 185 Wörter/Min. reine Sprechgeschwindigkeit.
 - Messwerte: 3D 638 Bilder in ca. 616 s, Rest ca. 2 Minuten.

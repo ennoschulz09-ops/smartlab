@@ -37,10 +37,11 @@ LINES = [  # (Text, Einstellung, Pause danach)
     ("A lie.", "bell_lie", 0.30),
     ("You smile. The report says four.", "pip_report", 0.18),
     ("His smile cracks.", "sales_crack", 0.18),
-    ("Two thousand dollars, gone in ten seconds.", "price_drop", 0.28),
-    ("And you're just getting started.", "hero_end", 0.40),
-    (None, "title_card", 3.0),
-    ("But every lie you hear... costs you something.", "tease", 1.6),
+    ("The price falls with it.", "price_drop", 0.15),
+    ("Two thousand dollars, gone in ten seconds.", "price_drop", 0.34),
+    ("And you're just getting started.", "hero_end", 0.55),
+    (None, "title_card", 3.4),
+    ("But every lie you hear... costs you something.", "tease", 2.2),
 ]
 TARGET_WPM = 185.0   # reine Sprechgeschwindigkeit; mit Pausen ca. 170 bis 175 (Vorbild: 173)
 
@@ -56,7 +57,7 @@ def synth(text, speed):
 # Tempo kalibrieren (ein Probelauf bei 1.0)
 words = sum(len(t.split()) for t, _, _ in LINES if t)
 dur1 = sum(len(synth(t, 1.0)) / SR for t, _, _ in LINES if t)
-speed = float(np.clip((words / dur1 * 60) / TARGET_WPM, 0.78, 1.15))
+speed = float(np.clip(TARGET_WPM / (words / dur1 * 60), 0.78, 1.15))  # Dauer ~ 1/Tempo: schneller sprechen, wenn die Stimme zu langsam ist
 print(f"Stimme {VOICE}: Tempo-Faktor {speed:.2f}", flush=True)
 
 tl, t = [], 0.45
@@ -68,15 +69,18 @@ for text, shot, pause in LINES:
     t += len(x) / SR + pause
 TOTAL = t + 0.2
 spoken = sum(l["t1"] - l["t0"] for l in tl if l["x"] is not None)
-print(f"Dauer {TOTAL:.1f} s, Sprechtempo {words / spoken * 60:.0f} Woerter/Min., mit Pausen {words / (TOTAL - 0.65 - 3.0) * 60:.0f}", flush=True)
+print(f"Dauer {TOTAL:.1f} s, Sprechtempo {words / spoken * 60:.0f} Woerter/Min., mit Pausen {words / (TOTAL - 0.65 - 3.4 - 2.2) * 60:.0f}", flush=True)
 shots = []
 for L in tl:
     shots.append(dict(name=L["shot"], t0=0.0 if not shots else L["t0"] - 0.05))
 for i, s in enumerate(shots):
     s["t1"] = shots[i + 1]["t0"] if i + 1 < len(shots) else TOTAL
-LI = {l["shot"]: l for l in tl}
+LI = {}
+for l in tl:
+    LI.setdefault(l["shot"], l)  # erste Zeile je Einstellung
+PD = [l for l in tl if l["shot"] == "price_drop"]
 EV = dict(hear=LI["pip_hook"]["t0"] + 1.5, demo=LI["demo_two"]["t0"] + 0.8, lie=LI["bell_lie"]["t0"] + 0.02,
-          price=LI["price_drop"]["t0"] + 1.5, title=LI["title_card"]["t0"], tease=LI["tease"]["t0"] + 0.35)
+          price=LI["price_drop"]["t0"] + 0.9, loss=PD[-1]["t0"] + 0.15, title=LI["title_card"]["t0"], tease=LI["tease"]["t0"] + 0.35)
 
 # ---------------------------------------------------------------- Ton
 mix = audio.Mix(TOTAL)
@@ -188,8 +192,8 @@ def compose(g, i, t):
         X.bubble(g, clampx(sh[0] + 260, 260, W - 260), max(110, sh[1] - 175), "One previous owner.", 32, tail=(-160, 60), k=overshoot((t - s["t0"] - 0.2) / 0.3))
     if n == "bell_lie" and tg and t >= EV["lie"]:
         X.pill(g, clampx(tg[0] + 230, 150), max(70, tg[1] + 20), "LIE", 52, fill=C(220, 44, 60, 248), k=overshoot((t - EV["lie"] - 0.1) / 0.3))
-    if n == "price_drop" and t >= EV["price"]:
-        g.text("-$2,000", 640, 130, 108, fill=C(255, 90, 90), stroke=C(255, 255, 255), stroke_w=12, rot=-5, scale=max(0.01, overshoot((t - EV["price"] - 0.1) / 0.25)), shadow=(5, 8, C(0, 0, 0, 110), 6))
+    if n == "price_drop" and t >= EV["loss"]:
+        g.text("-$2,000", 640, 130, 108, fill=C(255, 90, 90), stroke=C(255, 255, 255), stroke_w=12, rot=-5, scale=max(0.01, overshoot((t - EV["loss"]) / 0.25)), shadow=(5, 8, C(0, 0, 0, 110), 6))
     if n == "title_card":
         lt = t - EV["title"]
         g.text("WHAT IF YOU COULD", 640, 150, 66, fill=C(255, 255, 255), stroke=C(52, 24, 90), stroke_w=11, shadow=(0, 8, C(0, 0, 0, 110), 6), scale=max(0.01, overshoot((lt - 0.1) / 0.4)))
