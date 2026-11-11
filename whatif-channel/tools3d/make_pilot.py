@@ -15,7 +15,7 @@ import audio
 import explainer as X
 from audio import SR
 
-argv = sys.argv[1:]
+argv = [a for a in sys.argv[1:] if a != "--timeline-only"]
 STILLS = None
 if "--stills" in argv:
     k = argv.index("--stills"); STILLS = [float(v) for v in argv[k + 1].split(",")]; argv = argv[:k] + argv[k + 2:]
@@ -111,6 +111,21 @@ def spec(i, t):
 
 
 nframes = int(TOTAL * FPS)
+TLJ = os.path.join(WORK, "timeline.json")
+now_tl = dict(total=TOTAL, nframes=nframes, shots=[(x["name"], round(x["t0"], 3)) for x in shots], ev={k: round(v, 3) for k, v in EV.items()})
+if "--timeline-only" in sys.argv:
+    json.dump(now_tl, open(TLJ, "w")); print("Zeitplan gespeichert"); sys.exit(0)
+if REUSE:
+    # Schutz: die 3D-Bilder passen nur zum Zeitplan des vollen Laufs. Andere Stimme/Tempo = neuer voller Lauf noetig.
+    if not os.path.exists(TLJ):
+        sys.exit("FEHLER: kein gespeicherter Zeitplan (timeline.json). Erst einen vollen Lauf machen.")
+    old = json.load(open(TLJ))
+    bad = old["nframes"] != nframes or any(abs(a[1] - b[1]) > 0.06 for a, b in zip(old["shots"], now_tl["shots"])) or any(abs(old["ev"][k] - now_tl["ev"][k]) > 0.06 for k in old["ev"])
+    if bad:
+        sys.exit("FEHLER: Der Zeitplan weicht vom gespeicherten Lauf ab (andere Stimme oder anderes Tempo). "
+                 "Die 3D-Bilder passen dann nicht mehr: bitte ohne --reuse neu rendern (ca. 15 Minuten).")
+else:
+    json.dump(now_tl, open(TLJ, "w"))
 times = STILLS if STILLS else [i / FPS for i in range(nframes)]
 specs = [spec(i, times[i]) for i in range(len(times))]
 print(f"{len(times)} Bilder", flush=True)

@@ -22,7 +22,7 @@ npm install three@0.160.0            # im Ordner tools3d
 npm install -g playwright            # oder vorinstalliertes Playwright mit Chromium
 KOKORO_V1_DIR=/pfad/kokoro-multi-lang-v1_0 python3 make_video.py beispiel.mp4 am_michael am_onyx am_puck
 # nur Einzelbilder prüfen:    ... make_video.py x.mp4 --stills 1.2,5.9,15.3
-# Erneut zusammenbauen ohne 3D neu zu rendern:   ... make_video.py beispiel.mp4 --reuse   (gleiches WORK-Verzeichnis)
+# (make_video.py: --reuse nur bei unverändertem Zeitplan)
 ```
 
 ## Messwerte (4 Kerne, 1280x720, 24 Bilder pro Sekunde)
@@ -43,7 +43,8 @@ KOKORO_V1_DIR=/pfad/kokoro-multi-lang-v1_0 python3 make_video.py beispiel.mp4 am
 ```bash
 KOKORO_V1_DIR=/pfad/kokoro-multi-lang-v1_0 python3 make_pilot.py pilot.mp4 am_eric
 # optional jugendlicher: PITCH_SHIFT=2 ...   (Halbtöne höher)
-# nur Ton/Beschriftung/Grading neu (3D bleibt):   ... --reuse   (gleiches WORK-Verzeichnis)
+# nur Beschriftung/Grading/Ton neu bei GLEICHER Stimme und gleichem Tempo:   ... --reuse   (gleiches WORK-Verzeichnis)
+# Andere Stimme = anderer Zeitplan = voller Lauf (ca. 15 Minuten). --reuse bricht dann mit einer Fehlermeldung ab.
 ```
 
 - Shotliste: `../06-shotliste-pilot.md`. Pip ist in jedem Bild.
