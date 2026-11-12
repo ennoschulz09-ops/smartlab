@@ -42,5 +42,5 @@ arms(cast[2], [{ sh: [0.2, 0, 0.35], el: [-1.0, 0, 0.3] }, { sh: [0.2, 0, -0.35]
 arms(cast[3], [{ sh: [-0.9, 0, 0.7], el: [-1.9, 0, -0.1] }, { sh: [-0.9, 0, -0.7], el: [-1.9, 0, 0.1] }]); handPose(cast[3].arms[0].hand, 'fist'); handPose(cast[3].arms[1].hand, 'fist'); drawFace2(cast[3].face, { eye: ['dot', 'dot'], mouth: 'flat' });
 arms(cast[4], [{ sh: [-0.4, 0, 2.5], el: [-0.2, 0, -0.6] }, { sh: [-0.4, 0, -2.5], el: [-0.2, 0, 0.6] }]); handPose(cast[4].arms[0].hand, 'peace'); handPose(cast[4].arms[1].hand, 'peace'); drawFace2(cast[4].face, { eye: ['dot', 'wink'], mouth: 'laugh' });
 cast[1].root.position.y = 0.0;
-window.renderFrame = (s) => { cam.position.set(0.2, 1.7, 15.5); cam.lookAt(0, 2.5, 0); bokeh.uniforms.focus.value = 15.5; comp.render(); return {}; }; window.ready = true;
+window.renderFrame = (s) => { if (s.i === 2) { cam.position.set(-1.5, 3.6, 7.5); cam.lookAt(-1.8, 3.3, 0); bokeh.uniforms.focus.value = 7.5; } else if (s.i === 3) { cam.position.set(1.8, 0.8, 8); cam.lookAt(1.8, 0.8, 0); bokeh.uniforms.focus.value = 8; } else { cam.position.set(0.2, 1.7, 15.5); cam.lookAt(0, 2.5, 0); bokeh.uniforms.focus.value = 15.5; } comp.render(); return {}; }; window.ready = true;
 </script></body></html>
