@@ -66,7 +66,7 @@ export function makeBuddy(opt = {}) {
   const pocket = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.2, 0.06), mat(o.hoodie, { roughness: 0.9 })); pocket.position.set(0, 1.25, 0.46); pocket.rotation.x = -0.15; body.add(pocket);
   const hood = new THREE.Mesh(new THREE.TorusGeometry(0.3, 0.12, 12, 28), mat(o.hoodie, { roughness: 0.85 })); hood.rotation.x = Math.PI / 2; hood.position.y = 2.0; hood.scale.set(1, 0.8, 1); body.add(hood);
   for (const s of [-1, 1]) { const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.36, 8), mat(0xffd2e6)); cord.position.set(s * 0.12, 1.8, 0.47); body.add(cord); }
-  if (o.tie) { const tie = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.52, 0.05), mat(o.tie, { roughness: 0.5 })); tie.position.set(0, 1.72, 0.5); tie.rotation.x = -0.12; body.add(tie);
+  if (o.tie) { const tie = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.52, 0.05), mat(o.tie, { roughness: 0.5 })); tie.position.set(0, 1.72, 0.5); tie.rotation.x = -0.12; body.add(tie); parts.tie = tie;
     const knot = new THREE.Mesh(new THREE.BoxGeometry(0.17, 0.12, 0.07), mat(o.tie, { roughness: 0.5 })); knot.position.set(0, 1.98, 0.47); body.add(knot); }
   const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.32, 12), mat(0xf4d6e8)); neck.position.y = 2.2; body.add(neck);
   const head = new THREE.Group(); head.position.y = 2.18 + 0.8; body.add(head); parts.head = head;
@@ -85,7 +85,7 @@ export function makeBuddy(opt = {}) {
   if (o.beanie) {
     const b = new THREE.Mesh(new THREE.SphereGeometry(0.84, 48, 24, 0, Math.PI * 2, 0, Math.PI * 0.4), mat(o.beanie, { roughness: 0.9 })); b.position.y = 0.04; b.rotation.x = -0.1; head.add(b);
     const fold = new THREE.Mesh(new THREE.TorusGeometry(0.76, 0.1, 12, 40), mat(0xf4ecff, { roughness: 0.9 })); fold.rotation.x = Math.PI / 2 - 0.1; fold.position.set(0, 0.34, 0.02); fold.scale.set(1, 1, 1); head.add(fold);
-    const pom = new THREE.Mesh(new THREE.SphereGeometry(0.17, 20, 16), mat(0xf4ecff, { roughness: 0.95 })); pom.position.set(0, 0.92, 0); head.add(pom);
+    const pom = new THREE.Mesh(new THREE.SphereGeometry(0.17, 20, 16), mat(0xf4ecff, { roughness: 0.95 })); pom.position.set(0, 0.92, 0); head.add(pom); parts.pom = pom;
   }
   parts.arms = [];
   for (const s of [-1, 1]) {

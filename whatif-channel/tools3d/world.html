@@ -10,7 +10,7 @@ import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { makeBuddy, drawFace } from './buddy.js';
-const W = 1280, H = 720;
+const Q = new URLSearchParams(location.search); const W = +(Q.get('w') || 1280), H = +(Q.get('h') || 720);
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
 renderer.setSize(W, H); renderer.setPixelRatio(1); renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.82; document.body.appendChild(renderer.domElement);
@@ -134,124 +134,119 @@ function bellTag(target, age, extra = 0) { // Glocke schwebt ueber dem Kopf, lae
 function sunBehind(from, target, off = [0, 0.6, 0]) { const d = new THREE.Vector3(...target).sub(new THREE.Vector3(...from)).normalize(); const p = new THREE.Vector3(...from).add(d.multiplyScalar(70)); sun.position.set(p.x + off[0], p.y + off[1], p.z + off[2]); sun.lookAt(...from); }
 const CAR_P = [2.0, 0, 0];
 
-// ---------------------------------------------------------------- Einstellungen (Pip ist in jedem Bild)
-const SHOTS = {
-  pip_hook(s) { // 1: Pip frontal nah
-    const lt = s.lt; rest(hero); sales.root.visible = true; place(sales, [-1.7, 0, -4], [0, 0, 6]); sales.root.visible = false; mainCar.position.set(5, 0, -6); mainCar.rotation.y = Math.PI;
-    place(hero, [0, 0, 0], [1.2, 0, 6], 0.1); pockets(hero); idle(hero, s.t, 0.2);
-    const c = keys(lt, [{ t: 0, p: [1.1, 3.55, 5.6], l: [0, 3.15, 0], fov: 33 }, { t: 2.4, p: [0.5, 3.45, 4.5], l: [0, 3.2, 0], fov: 31 }]); setCam(c);
-    lighting(L_BACK); sunBehind(c.p, [0, 3.4, 0], [-1.2, 0.3, 0]);
-    drawFace(hero.face, { lid: 0.5, brow: [10, -4], rise: [0, 10], mouth: 'smirk', look: [0.6, 0.1] });
-    return { focus: cam.position.distanceTo(headPos(hero)), tag: null };
-  },
-  demo_two(s) { // 2: Zwei-Einstellung, Verkaeufer winkt, Glocke ueber seinem Kopf
-    const lt = s.lt, t = s.t; rest(hero); rest(sales); mainCar.position.set(3.4, 0, -4.6); mainCar.rotation.y = Math.PI;
-    place(hero, [-2.8, 0, 3.4], [3.0, 0, -2.4], 0.5); hero.arms[0].sh.rotation.set(0, 0, 0.2); hero.arms[1].sh.rotation.set(0, 0, -0.2); idle(hero, t, 0.4);
-    place(sales, [3.0, 0, -2.4], [-3.4, 0, 8]); sales.arms[1].sh.rotation.set(0, 0, 2.5 + Math.sin(t * 9) * 0.22); sales.arms[0].sh.rotation.z = 0.15; idle(sales, t, 1.2, 0.5);
-    const c = keys(lt, [{ t: 0, p: [-4.2, 3.7, 11.4], l: [1.4, 3.6, -0.8], fov: 31, roll: -1.5 }, { t: 2.4, p: [-3.6, 3.7, 10.2], l: [1.4, 3.7, -1.0], fov: 30, roll: -2.5 }]); setCam(c);
-    lighting(L_BACK); sunBehind(c.p, [4, 4, -6], [0, 1, 0]);
-    drawFace(sales.face, { lid: 0.1, brow: [-6, -6], rise: [10, 10], mouth: 'smile', look: [-0.5, 0.2] }); drawFace(hero.face, { lid: 0.35, brow: [6, 6], mouth: s.ev.demo >= 0 ? 'flat' : 'smirk', look: [0.7, 0] });
-    return { focus: cam.position.distanceTo(headPos(sales)) - 0.6, tagTarget: sales, tagAge: s.ev.demo };
-  },
-  walk_wide(s) { // 3: Pip laeuft zum Auto
-    const lt = s.lt, t = s.t; rest(hero); rest(sales); mainCar.position.set(...CAR_P); mainCar.rotation.y = Math.PI;
-    const x = lerp(9.4, 4.6, sm(lt / 2.1)); hero.root.position.set(x, 0, 2.3); hero.root.rotation.y = -Math.PI / 2 - 0.12; walk(hero, t, 6.5);
-    place(sales, [-1.7, 0, 0.3], [3, 0, 3]); sales.arms[0].sh.rotation.z = 0.15; sales.arms[1].sh.rotation.z = -0.15; idle(sales, t, 0.7, 0.6);
-    const c = keys(lt, [{ t: 0, p: [10.5, 1.5, 9.6], l: [3, 2.2, 0.5], fov: 38, roll: 1.5 }, { t: 2.4, p: [5.4, 1.9, 9.0], l: [1.6, 2.4, 0.3], fov: 37, roll: 0.5 }]); setCam(c);
-    lighting(L_BACK); sunBehind(c.p, [-3, 3, -8], [0, 1, 0]);
-    drawFace(sales.face, { lid: 0.1, brow: [-4, -4], mouth: 'smile' }); drawFace(hero.face, { lid: 0.45, brow: [4, 4], mouth: 'smile', look: [-0.8, 0] });
-    return { focus: cam.position.distanceTo(headPos(hero)) };
-  },
-  pat_hood(s) { // 4: Verkaeufer klopft auf die Motorhaube, Pip daneben
-    const lt = s.lt, t = s.t; rest(hero); rest(sales); mainCar.position.set(...CAR_P); mainCar.rotation.y = Math.PI;
-    place(sales, [-1.5, 0, 0.1], [2, 0, 0.1]); const pat = Math.abs(Math.sin(t * 6)) * 0.2; sales.arms[0].sh.rotation.set(-1.2 + pat, 0, 0); sales.arms[0].el.rotation.set(-0.45, 0, 0); sales.arms[1].sh.rotation.z = -0.3; idle(sales, t, 0.4, 0.6);
-    place(hero, [3.6, 0, 2.8], [-1.5, 0, 0.1], 0.9); pockets(hero); idle(hero, t, 1.1);
-    const c = keys(lt, [{ t: 0, p: [3.4, 3.1, 11.4], l: [0.8, 2.9, 0.8], fov: 31 }, { t: 2.4, p: [2.8, 3.1, 10.4], l: [0.6, 3.0, 0.8], fov: 30 }]); setCam(c);
-    lighting(L_BACK); sunBehind(c.p, [-2, 3, -8], [3, 1, 0]);
-    drawFace(sales.face, { lid: 0.05, brow: [-6, -6], rise: [10, 10], mouth: 'smile', look: [0.6, 0.2] }); drawFace(hero.face, { lid: 0.4, brow: [0, 0], mouth: 'smile', look: [0.8, 0] });
-    return { focus: cam.position.distanceTo(headPos(hero)) + 0.5 };
-  },
-  ots_pitch(s) { // 5: ueber Pips Schulter, Verkaeufer luegt
-    const lt = s.lt, t = s.t; rest(hero); rest(sales); mainCar.position.set(2.8, 0, -3.4); mainCar.rotation.y = Math.PI;
-    place(hero, [-3.8, 0, 3.0], [2.4, 0, -1.6]); pockets(hero); idle(hero, t, 0.3, 0.6);
-    place(sales, [2.4, 0, -1.6], [-4, 0, 8]); sales.arms[0].sh.rotation.set(0.0, 0, 0.5); sales.arms[1].sh.rotation.set(-0.6, 0, -0.7); idle(sales, t, 0.2, 0.5);
-    const c = keys(lt, [{ t: 0, p: [-4.6, 3.9, 8.6], l: [1.8, 3.2, -1.2], fov: 25, roll: -2 }, { t: 2.1, p: [-4.2, 3.9, 7.7], l: [2.0, 3.2, -1.4], fov: 24, roll: -3 }]); setCam(c);
-    lighting(L_BACK); sunBehind(c.p, [5, 3, -6], [0, 1, 0]);
-    drawFace(sales.face, { lid: 0.05, brow: [-8, -8], rise: [12, 12], mouth: 'smile', look: [-0.3, 0.1] });
-    return { focus: cam.position.distanceTo(headPos(sales)) - 0.3 };
-  },
-  bell_lie(s) { // 6: Glocke ueber dem Verkaeufer
-    const lt = s.lt, t = s.t; rest(hero); rest(sales); mainCar.position.set(3.2, 0, -3.8); mainCar.rotation.y = Math.PI;
-    place(sales, [0.4, 0, 0], [-1, 0, 9]); sales.arms[1].sh.rotation.set(-0.5, 0, -0.6); sales.arms[0].sh.rotation.z = 0.25; idle(sales, t, 0.5, 0.5);
-    place(hero, [-4.2, 0, 3.4], [0.4, 0, 0]); pockets(hero);
-    const c = keys(lt, [{ t: 0, p: [0.9, 3.7, 8.6], l: [0.2, 3.8, 0], fov: 38, roll: 1 }, { t: 1.2, p: [0.5, 3.7, 7.6], l: [0.1, 3.9, 0], fov: 37, roll: 2 }]); setCam(c);
-    lighting(L_BACK); sunBehind(c.p, [-1, 3.8, -8], [0, 0.8, 0]);
-    drawFace(sales.face, { lid: 0.05, brow: [-6, -6], rise: [8, 8], mouth: 'smile', look: [-0.3, 0.1] });
-    return { focus: cam.position.distanceTo(headPos(sales)), tagTarget: sales, tagAge: s.ev.lie };
-  },
-  pip_report(s) { // 7: Pip haelt den Bericht hoch
-    const lt = s.lt, t = s.t; rest(hero); sales.root.visible = false; mainCar.position.set(5.0, 0, -7); mainCar.rotation.y = Math.PI;
-    place(hero, [0, 0, 0], [-1.5, 0, 6], 0.25); hero.arms[0].sh.rotation.set(0.1, 0, 0.3); hero.arms[1].sh.rotation.set(-0.9, 0, -0.55); hero.arms[1].el.rotation.set(-0.8, 0, 0); idle(hero, t, 0.2, 0.7);
-    hero.root.updateMatrixWorld(true); const hp = new THREE.Vector3(); hero.arms[1].hand.getWorldPosition(hp); paper.visible = true; paper.position.set(hp.x + 0.55, hp.y + 0.45, hp.z + 0.5); paper.rotation.set(0, -0.15, -0.06); const k = sm((lt - 0.2) / 0.4); paper.scale.setScalar(0.3 + 0.55 * k);
-    const c = keys(lt, [{ t: 0, p: [-1.6, 3.4, 8.6], l: [0.4, 3.0, 0], fov: 30, roll: -1 }, { t: 2.6, p: [-1.1, 3.4, 7.6], l: [0.4, 3.0, 0], fov: 29, roll: -2 }]); setCam(c);
-    lighting(L_BACK); sunBehind(c.p, [3, 3.4, -4], [0, 0.6, 0]);
-    drawFace(hero.face, { lid: 0.4, brow: [4, 4], mouth: 'smile', look: [-0.5, 0.1] });
-    return { focus: cam.position.distanceTo(headPos(hero)) };
-  },
-  sales_crack(s) { // 8: Verkaeufer schwitzt (ueber Pips Schulter)
-    const lt = s.lt, t = s.t; rest(hero); rest(sales); mainCar.position.set(3.0, 0, -5); mainCar.rotation.y = Math.PI;
-    place(hero, [-3.6, 0, 3.4], [1.4, 0, -1.2]); pockets(hero); idle(hero, t, 0.2, 0.5); paper.visible = false;
-    place(sales, [1.4, 0, -1.2], [-3.6, 0, 8]); sales.arms[0].sh.rotation.set(-0.7, 0, 0.5); sales.arms[1].sh.rotation.set(-0.7, 0, -0.5); idle(sales, t, 0.2, 0.4);
-    const sw = Math.min(1, lt / 0.9);
-    const c = keys(lt, [{ t: 0, p: [-4.2, 3.9, 8.4], l: [1.2, 3.3, -0.8], fov: 25, roll: -2 }, { t: 1.4, p: [-3.8, 3.9, 7.6], l: [1.2, 3.35, -0.9], fov: 24, roll: -3 }]); setCam(c);
-    lighting(L_BACK); sunBehind(c.p, [4, 3, -6], [0, 1, 0]);
-    drawFace(sales.face, { lid: 0.0, brow: [-22, -22], rise: [10 + 6 * sw, 10 + 6 * sw], mouth: lt > 0.5 ? 'frown' : 'smile', look: [0.9, 0.3], sweat: sw });
-    return { focus: cam.position.distanceTo(headPos(sales)) };
-  },
-  price_drop(s) { // 9: Preisschild faellt
-    const lt = s.lt, t = s.t; rest(hero); rest(sales); mainCar.position.set(2.2, 0, -0.6); mainCar.rotation.y = Math.PI; paper.visible = false;
-    board.position.set(0.2, 0, 1.6); board.rotation.y = 0.15; drawBoard(s.ev.price >= 0 ? s.ev.price / 0.5 : 0);
-    place(sales, [-2.4, 0, 0.4], [3, 0, 3]); sales.arms[0].sh.rotation.set(0.1, 0, 0.5); sales.arms[1].sh.rotation.set(0.1, 0, -0.5); sales.head.rotation.x = 0.0;
-    place(hero, [4.3, 0, 2.2], [0.4, 0, 1.6], 0.95); pockets(hero); idle(hero, t, 0.7, 0.6);
-    const c = keys(lt, [{ t: 0, p: [6.2, 3.0, 10.8], l: [1.6, 2.9, 0.8], fov: 31, roll: 1.5 }, { t: 2.9, p: [5.4, 3.0, 9.8], l: [1.5, 2.9, 0.8], fov: 30, roll: 2.5 }]); setCam(c);
-    lighting(L_BACK); sunBehind(c.p, [-3, 3, -8], [2, 1, 0]);
-    drawFace(sales.face, { lid: 0.2, brow: [-14, -14], rise: [6, 6], mouth: 'frown', look: [0.6, -0.4] }); drawFace(hero.face, { lid: 0.4, brow: [4, 4], mouth: 'smile', look: [-0.9, 0] });
-    return { focus: cam.position.distanceTo(headPos(hero)) - 0.6 };
-  },
-  hero_end(s) { // 10: Pip im Gegenlicht
-    const lt = s.lt, t = s.t; rest(hero); sales.root.visible = false; mainCar.position.set(4.5, 0, -8); mainCar.rotation.y = Math.PI; paper.visible = false;
-    place(hero, [0, 0, 0], [3, 0, 6], -0.25 + sm(lt / 1.2) * 0.45); pockets(hero); idle(hero, t, 0.2, 0.8);
-    const c = keys(lt, [{ t: 0, p: [0.6, 3.1, 6.6], l: [0, 3.15, 0], fov: 36, roll: 1.5 }, { t: 2.2, p: [0.3, 3.2, 5.2], l: [0, 3.25, 0], fov: 33, roll: 2 }]); setCam(c);
-    lighting({ ...L_BACK, ri: 2.4, ki: 3.8 }); sunBehind(c.p, [0, 3.4, 0], [-0.6, 0.4, 0]);
-    drawFace(hero.face, { lid: 0.4, brow: [6, -2], rise: [0, 6], mouth: lt > 0.6 ? 'smile' : 'smirk', look: [lt > 0.6 ? 0 : 0.7, 0.1] });
-    return { focus: cam.position.distanceTo(headPos(hero)) };
-  },
-  title_card(s) { // 11: Titelkarte, Autohof-Silhouette, Pip klein
-    const lt = s.lt, t = s.t; rest(hero); sales.root.visible = false; paper.visible = false; mainCar.position.set(-1, 0, -2); mainCar.rotation.y = Math.PI;
-    place(hero, [3.6, 0, 4.8], [-4, 0, -30]); pockets(hero); idle(hero, t, 0.3, 0.5);
-    const c = keys(lt, [{ t: 0, p: [1.0, 2.6, 17], l: [-0.5, 5.2, 0], fov: 38 }, { t: 3.0, p: [0.6, 2.7, 15.5], l: [-0.5, 5.3, 0], fov: 38 }]); setCam(c);
-    lighting({ ...L_BACK, ki: 2.2, hi: 1.0 }); sunBehind(c.p, [-0.5, 5.6, 0], [0, -0.5, 0]);
-    drawFace(hero.face, {}); return { focus: 14, aperture: 0.00025 };
-  },
-  tease(s) { // 12: Pip nah, Glocke laeutet lauter
-    const lt = s.lt, t = s.t; rest(hero); sales.root.visible = false; paper.visible = false; mainCar.position.set(5, 0, -6); mainCar.rotation.y = Math.PI;
-    place(hero, [0, 0, 0], [1, 0, 6]); pockets(hero); idle(hero, t, 0.2, 0.6);
-    const c = keys(lt, [{ t: 0, p: [1.0, 3.4, 6.2], l: [0, 3.1, 0], fov: 30 }, { t: 3.0, p: [0.5, 3.35, 5.3], l: [0, 3.1, 0], fov: 28 }]); setCam(c);
-    lighting({ ...L_BACK, ki: 2.6, hi: 1.0 }); sunBehind(c.p, [0, 3.4, 0], [-1, 0.2, 0]);
-    const sad = Math.min(1, lt / 1.0); drawFace(hero.face, { lid: 0.3 + 0.25 * sad, brow: [-14 * sad, -14 * sad], rise: [6 * sad, 6 * sad], mouth: sad > 0.5 ? 'flat' : 'smile', look: [0, 0.2] });
-    return { focus: cam.position.distanceTo(headPos(hero)) };
-  },
+// ---------------------------------------------------------------- Story: durchgehende Szene mit Aktionen
+let META = null; window.setMeta = (m) => { META = m; };
+const c01 = t => Math.max(0, Math.min(1, t));
+const U = (t, a, b) => c01((t - a) / (b - a));
+const EO = t => 1 - Math.pow(1 - c01(t), 3);
+const EB = (t, k = 1.7) => { t = c01(t); return 1 + (k + 1) * Math.pow(t - 1, 3) + k * Math.pow(t - 1, 2); };   // mit Ueberschwingen
+const SP = (age, f = 3.2, d = 5) => age < 0 ? 0 : Math.exp(-d * age) * Math.cos(2 * Math.PI * f * age);        // gedaempfte Feder
+const P_X0 = 13.0, P_X1 = 5.7, P_Z = 1.9, S_POS = [0.7, 0, 1.9];
+const pipX = (t) => lerp(P_X0, P_X1, sm(U(t, META.B.n1[0] - 0.5, META.B.n2[0] + 0.7)));
+const bongAge = (t) => { let a = -1, w = null; META.bongs.forEach((b, i) => { if (t >= b.t) { a = t - b.t; w = b.who; } }); return [a, w]; };
+const earK = (t) => { // Haende an den Ohren: ab dem 1. Schlag, loest sich in n3, danach kurze Ausschlaege
+  const b = META.bongs; if (!b.length) return 0; const B = META.B;
+  let k = U(t, b[0].t, b[0].t + 0.12) * (1 - U(t, B.n3[0] + 0.3, B.n3[0] + 1.1));
+  b.forEach((x, i) => { if (i > 0 && t >= x.t) { const a = t - x.t; const amp = x.who === 'pip' ? 1.0 : 0.55; k = Math.max(k, amp * Math.exp(-a * (x.who === 'pip' ? 0.35 : 4.0)) * U(a, 0, 0.1)); } });
+  return k;
+};
+function walkPose(b, phase, w) { const s = Math.sin(phase); b.legs[0].rotation.x += s * 0.6 * w; b.legs[1].rotation.x += -s * 0.6 * w; b.arms[0].sh.rotation.x += -s * 0.5 * w; b.arms[1].sh.rotation.x += s * 0.5 * w;
+  b.body.position.y += Math.abs(Math.cos(phase)) * 0.08 * w; b.body.rotation.z += Math.sin(phase) * 0.035 * w; b.body.rotation.x += 0.07 * w; }
+function earsPose(b, k) { if (k <= 0.001) return; const e = EB(k, 1.2); for (const [i, s] of [[0, -1], [1, 1]]) { b.arms[i].sh.rotation.z = lerp(b.arms[i].sh.rotation.z, s * 2.3, e); b.arms[i].sh.rotation.x = lerp(b.arms[i].sh.rotation.x, -0.15, e); b.arms[i].el.rotation.z = lerp(b.arms[i].el.rotation.z, s * 1.4, e); b.arms[i].el.rotation.x = lerp(b.arms[i].el.rotation.x, 0, e); } }
+const faceAng = (a, b) => Math.atan2(b[0] - a[0], b[2] - a[2]);
+const wp = (o) => { const v = new THREE.Vector3(); o.getWorldPosition(v); return v; };
+
+function animate(s) {
+  const t = s.t, B = META.B; rest(hero); rest(sales); paper.visible = false; board.visible = false;
+  mainCar.position.set(2.8, 0, 0.1); mainCar.rotation.y = Math.PI; hero.torso.scale.set(1.3, 1.22, 0.92); sales.torso.scale.set(1.3, 1.22, 0.92);
+  const [age, who] = bongAge(t); const fl = age >= 0 && age < 1.4 ? Math.exp(-age * 3.2) : 0;
+  const px = pipX(t), v = Math.abs(pipX(t + 0.02) - pipX(t - 0.02)) / 0.04, wk = c01(v / 1.4);
+  // ---------------- Pip
+  const sPos = [S_POS[0] + 0.9 * sm(U(t, B.s1[0], B.s1[0] + 0.9)) - 0.4 * sm(U(t, B.p4[0] - 0.1, B.p4[0] + 0.4)) + 0.3 * (B.p5 ? U(t, B.p5[0] - 0.4, B.p5[0] + 0.3) : 0), 0, S_POS[2]];
+  const hs = (B.p5 ? U(t, B.p5[0] - 0.4, B.p5[0] + 0.3) : 0);
+  const pipPos = [px - 0.5 * sm(U(t, B.p4[0] - 0.1, B.p4[0] + 0.35)) - 0.8 * hs, 0, P_Z];
+  hero.root.position.set(pipPos[0], 0, pipPos[2]);
+  const fsal = faceAng(pipPos, sPos);
+  hero.root.rotation.y = lerp(lerp(-Math.PI / 2 + 0.05, fsal + 0.55, EO(U(t, B.n2[0] - 0.1, B.n2[0] + 0.9))), -Math.PI / 2, hs);
+  walkPose(hero, (P_X0 - px) * 2.5, wk);
+  // Haende reiben (Vorfreude), solange er nicht laeuft und noch nichts passiert ist
+  const rub = (1 - wk) * U(t, B.n2[0] + 0.4, B.n2[0] + 0.7) * (1 - U(t, B.s1[0] - 0.2, B.s1[0] + 0.1));
+  if (rub > 0) for (const i of [0, 1]) { hero.arms[i].sh.rotation.x = -0.75 * rub; hero.arms[i].el.rotation.x = -1.0 * rub; hero.arms[i].sh.rotation.z = (i ? -0.55 : 0.55) * rub + Math.sin(t * 22 + i) * 0.06 * rub; }
+  else if (wk < 0.05) { hero.arms[0].sh.rotation.z = 0.2; hero.arms[1].sh.rotation.z = -0.2; }
+  if (wk < 0.9 && !(rub > 0)) { hero.head.rotation.y += Math.sin(t * 1.3) * 0.04; }
+  // Papier ziehen: Anlauf (Arm zurueck), Wurf nach vorn, Papier klappt auf
+  const pu = U(t, B.p3[0] - 0.25, B.p3[0] + 0.35), holdPaper = t > B.p3[0] - 0.25 && t < B.s5[0] + 0.2;
+  let ek = earK(t);
+  if (holdPaper) { const a = pu < 0.35 ? -0.4 * (pu / 0.35) : lerp(-0.4, 1.0, EB((pu - 0.35) / 0.65, 2.0)); hero.arms[1].sh.rotation.x = -1.2 * Math.max(0, a) + 0.4 * Math.min(0, a); hero.arms[1].el.rotation.x = -0.9 * Math.max(0, a); hero.arms[1].sh.rotation.z = -0.3 * Math.max(0, a); }
+  const jab = U(t, B.p4[0], B.p4[0] + 0.25) * (1 - U(t, B.p4[0] + 0.5, B.p4[0] + 0.9)); if (holdPaper) hero.arms[1].sh.rotation.x -= 0.25 * jab;
+  const lis = U(t, B.s5[0] + 0.9, B.s5[0] + 1.4) * (1 - U(t, B.p5[0] - 0.1, B.p5[0] + 0.2)); hero.head.rotation.z += 0.16 * lis * Math.sin(U(t, B.s5[0] + 0.9, B.s5[0] + 1.6) * 3.14); hero.head.rotation.x += 0.0;
+  earsPose(hero, ek);
+  // Rueckstoss bei jedem Schlag: Kopf zurueck, Koerper staucht, Pom-Pom federt
+  const pf = who === 'pip' ? 0 : fl; hero.head.rotation.x += -0.14 * pf; hero.head.rotation.z += 0.1 * pf; hero.body.position.y += -0.1 * pf; hero.body.rotation.x += -0.2 * pf; hero.torso.scale.y *= (1 - 0.12 * pf);
+  hero.pom.position.y = 0.92 + 0.22 * SP(age, 4.2, 3.0) * (age < 1.5 ? 1 : 0); hero.pom.position.x = 0.12 * SP(age, 3.4, 3.0);
+  const lidP = pf > 0.15 ? 1.0 : (ek > 0.3 ? 0.85 : (t > B.n3[0] && t < B.p3[0] ? lerp(0.45, 0.55, 1) : 0.45));
+  const mouthP = s.sp.hero > 0.03 ? 'open' : (pf > 0.15 ? 'grit' : (ek > 0.3 ? 'frown' : (t > B.s5[0] + 0.9 ? 'smile' : 'smirk')));
+  drawFace(hero.face, { lid: lidP, brow: pf > 0.15 || ek > 0.3 ? [-22, -22] : [8, -2], rise: pf > 0.15 || ek > 0.3 ? [10, 10] : [0, 8], mouth: mouthP, open: s.sp.hero, look: [-0.4, 0.1] });
+  // ---------------- Verkaeufer
+  sales.root.position.set(...sPos);
+  const polish = 1 - U(t, B.s1[0] - 0.45, B.s1[0] - 0.05); const turn = EB(U(t, B.s1[0] - 0.4, B.s1[0] + 0.15), 1.4);
+  const fpip = faceAng(sPos, pipPos); sales.root.rotation.y = lerp(lerp(Math.PI, fpip - 0.55, turn), Math.PI / 2, hs);
+  if (polish > 0.01) { for (const i of [0, 1]) { sales.arms[i].sh.rotation.set(-1.15 * polish, 0, 0); sales.arms[i].sh.rotation.x += Math.sin(t * 9 + i * 2.2) * 0.22 * polish; sales.arms[i].el.rotation.x = -0.35 * polish; } }
+  const sp = turn; const talk = s.sp.sales > 0.03; const sT = (t - B.s1[0]);
+  if (t >= B.s1[0] - 0.1 && t < B.s2[0]) { // grosse Gesten: Arme breit, Klatschen, Motorhaube
+    const g = sT; const spread = EB(U(g, -0.2, 0.25), 1.5); const clap = Math.exp(-Math.pow((g - 0.85) * 9, 2));
+    for (const [i, sd] of [[0, -1], [1, 1]]) { sales.arms[i].sh.rotation.z = -sd * -1.05 * spread * (1 - clap) + sd * -0.25 * clap; sales.arms[i].sh.rotation.x = -0.35 * spread - 0.9 * clap; sales.arms[i].el.rotation.x = -0.3 * spread - 0.6 * clap; }
+    sales.body.rotation.z += Math.sin(g * 3.0) * 0.04; }
+  if (t >= B.s2[0] - 0.05 && t < B.n3[0]) { // nervoses Lachen: Schultern zittern, Haende wehren ab
+    const g = t - B.s2[0]; const sh = 0.05 * Math.sin(g * 36); sales.body.rotation.z += sh; sales.head.rotation.z += sh;
+    sales.arms[1].sh.rotation.z = -0.9 + 0.35 * Math.sin(g * 11); sales.arms[1].sh.rotation.x = -0.9; sales.arms[1].el.rotation.x = -0.8; sales.arms[0].sh.rotation.z = 0.5; sales.arms[0].sh.rotation.x = -0.6; sales.arms[0].el.rotation.x = -0.7; }
+  if (t >= B.n3[0] && t < B.s5[0]) { for (const i of [0, 1]) { sales.arms[i].sh.rotation.z = (i ? -0.35 : 0.35); } }
+  const typo = U(t, B.s3[0], B.s3[0] + 0.2) * (1 - U(t, B.p4[0] + 0.2, B.p4[0] + 0.5)); if (typo > 0) { sales.body.rotation.z += Math.sin(t * 50) * 0.02 * typo; sales.head.rotation.y += 0.25 * typo; }
+  const dbl = U(t, B.s4[0], B.s4[0] + 0.3) * (1 - U(t, B.s5[0] - 0.2, B.s5[0] + 0.1)); sales.torso.scale.y *= (1 - 0.14 * dbl); sales.body.position.y -= 0.18 * dbl; sales.head.rotation.x += 0.28 * dbl;
+  const surr = EB(U(t, B.s5[0], B.s5[0] + 0.35), 1.6); if (t >= B.s5[0] - 0.02) for (const [i, sd] of [[0, -1], [1, 1]]) { sales.arms[i].sh.rotation.z = lerp(sales.arms[i].sh.rotation.z, -sd * -2.4, surr); sales.arms[i].el.rotation.z = -sd * 0.4 * surr; sales.arms[i].sh.rotation.x = lerp(sales.arms[i].sh.rotation.x, -0.2, surr); }
+  const sweat = c01(U(t, B.s2[0], B.s4[0] + 0.5)) * (1 - U(t, B.s5[0] + 0.5, B.s5[0] + 1.4)) + 0.0;
+  const sFl = who === 'sales' ? fl : 0; sales.head.rotation.x += -0.1 * sFl;
+  drawFace(sales.face, { lid: 0.05, brow: sweat > 0.1 ? [-18, -18] : [-6, -6], rise: [10 + 6 * sweat, 10 + 6 * sweat], mouth: talk ? 'open' : (sweat > 0.1 ? 'grit' : 'smile'), open: s.sp.sales, look: [0.7, 0.2], sweat: sweat });
+  // ---------------- Handschlag (Haende aneinander ausrichten)
+  if (hs > 0.01) { const e = EB(hs, 1.2); hero.arms[1].sh.rotation.set(-1.45 * e, 0, 0); hero.arms[1].el.rotation.set(-0.05, 0, 0); sales.arms[0].sh.rotation.set(-1.45 * e, 0, 0); sales.arms[0].el.rotation.set(-0.05, 0, 0);
+    const pump = Math.sin((t - B.p5[0]) * 14) * 0.16 * hs; hero.arms[1].sh.rotation.x += pump; sales.arms[0].sh.rotation.x += pump;
+    hero.root.updateMatrixWorld(true); sales.root.updateMatrixWorld(true);
+    const hp = wp(hero.arms[1].hand), hq = wp(sales.arms[0].hand); const d = hp.clone().sub(hq); d.y = 0; d.multiplyScalar(c01(hs * 1.5)); sales.root.position.add(d); }
+  // ---------------- Preis: kurz an einem Beispiel gezeigt (Handschlag-Szene) wird nicht benoetigt
+  hero.root.updateMatrixWorld(true); sales.root.updateMatrixWorld(true);
+  if (holdPaper) { const hpv = wp(hero.arms[1].hand); paper.visible = true; paper.position.set(hpv.x - 0.2, hpv.y + 0.55, hpv.z + 0.55); paper.rotation.set(0, -0.5, 0.05 + 0.05 * Math.sin(t * 30) * jab); paper.scale.setScalar(Math.max(0.01, EB(U(t, B.p3[0] + 0.1, B.p3[0] + 0.45), 2.2)) * 0.8); }
+  return { px, age, who, ek, hs, sPos, pipPos };
+}
+
+const front = (H, rotY, dist, yoff, lat) => { const a = rotY + lat; return [H.x + Math.sin(a) * dist, H.y + yoff, H.z + Math.cos(a) * dist]; };
+const CAMS = {
+  follow_walk(lt, A) { const x = A.px; return { p: [x + 0.4, 1.8, 8.8], l: [x - 1.6, 2.4, 1.9], fov: 33, roll: 1.0, push: 0 }; },
+  two_shot(lt, A) { return { p: [3.4, 2.7, 10.4], l: [3.3, 2.8, 1.6], fov: 31, roll: 0.6 }; },
+  sales_mcu(lt, A) { const h = A.Hs; return { p: front(h, A.rS, 3.4, -0.9, -0.65), l: [h.x + 0.1, h.y - 0.3, h.z], fov: 40, roll: -2.5 }; },
+  pip_ears(lt, A) { const h = A.Hp; return { p: front(h, A.rP, 4.9, 0.1, 0.7), l: [h.x - 0.05, h.y - 0.35, h.z], fov: 30, shake: 0.09 * Math.exp(-lt * 4.5) }; },
+  ots_sales(lt, A) { const a = A.Hp, b = A.Hs; return { p: [a.x + 1.9, a.y + 0.6, a.z + 2.2], l: [b.x + 0.2, b.y - 0.15, b.z], fov: 27 }; },
+  pip_slow(lt, A) { const h = A.Hp; return { p: front(h, A.rP, 5.0 - lt * 0.5, 0.05, 0.6), l: [h.x, h.y - 0.1, h.z], fov: 28, push: 0 }; },
+  paper_pull(lt, A) { const m = (A.pipPos[0] + A.sPos[0]) / 2; return { p: [m, 2.9, 9.4], l: [m, 2.9, 1.9], fov: 30 }; },
+  sales_typo(lt, A) { const h = A.Hs; return { p: front(h, A.rS, 4.0, -0.35, -0.6), l: [h.x, h.y - 0.1, h.z], fov: 29 }; },
+  two_shot2(lt, A) { return { p: [3.4, 2.7, 10.4], l: [3.2, 2.9, 1.7], fov: 31, roll: 1.6 }; },
+  sales_truth(lt, A) { const h = A.Hs; return { p: front(h, A.rS, 3.8, -0.65, -0.55), l: [h.x, h.y - 0.35, h.z], fov: 31 }; },
+  pip_listen(lt, A) { const h = A.Hp; return { p: front(h, A.rP, 4.3, 0.1, 0.6), l: [h.x, h.y - 0.1, h.z], fov: 26 }; },
+  handshake(lt, A) { const m = (A.pipPos[0] + A.sPos[0]) / 2; return { p: [m + 0.6, 2.5, 8.0], l: [m, 2.3, 1.9], fov: 30 }; },
+  wide_title(lt, A) { return { p: [3.4 + lt * 0.3, 2.6, 17.5 - lt * 0.3], l: [1.4, 4.4, 0], fov: 38, push: 0 }; },
+  pip_teaser(lt, A) { const h = A.Hp; return { p: front(h, A.rP, 4.7 - lt * 0.3, 0.15, 0.5), l: [h.x, h.y - 0.1, h.z], fov: 25, shake: 0.05 * Math.sin(lt * 40) * Math.exp(-lt * 0.5) }; },
 };
 
 window.renderFrame = (s) => {
-  sales.root.visible = true; hero.root.visible = true; paper.visible = false; tag.visible = false; board.visible = (s.shot === 'price_drop');
-  const r = SHOTS[s.shot](s);
-  const tp = r.tagTarget ? bellTag(r.tagTarget, r.tagAge) : bellTag(null, -1); if (!r.tagTarget) { rings.forEach(x => x.material.opacity = 0); tagGlow.intensity = 0; }
-  bokeh.uniforms.focus.value = r.focus; bokeh.uniforms.aperture.value = r.aperture ?? 0.00032; bloom.strength = s.bloom ?? 0.28;
-  grade.uniforms.vig.value = 0.5; grade.uniforms.fade.value = s.fade ?? 1.0;
+  sales.root.visible = true; hero.root.visible = true; tag.visible = false;
+  const A0 = animate(s); if (s.t >= META.B.n6[0] - 0.1) sales.root.visible = false; const A = { px: A0.px, pipPos: A0.pipPos, sPos: A0.sPos, Hp: headPos(hero), Hs: headPos(sales), rP: hero.root.rotation.y, rS: sales.root.rotation.y };
+  const c = CAMS[s.cut](s.lt, A); const push = c.push ?? 0.025; const l = c.l; const p = c.p.map((v, k) => v + (l[k] - v) * push * Math.max(0, s.lt));
+  setCam({ p, l, fov: c.fov, roll: c.roll ?? 0 }, c.shake ?? 0, s.t);
+  lighting(L_BACK); sunBehind(p, l, [-0.8, 0.4, 0]); const close = c.fov < 33; sun.material.opacity = close ? 0.3 : 0.8; hemi.intensity = close ? 0.8 : 0.9;
+  let tp = null; const [bage, bwho] = bongAge(s.t); if (bwho === 'sales' && bage >= 0 && bage < 1.7) tp = bellTag(sales, bage); else bellTag(null, -1);
+  bokeh.uniforms.focus.value = cam.position.distanceTo(new THREE.Vector3(...l)); bokeh.uniforms.aperture.value = c.aperture ?? 0.00032; bloom.strength = 0.28; grade.uniforms.vig.value = 0.5; grade.uniforms.fade.value = s.fade ?? 1.0;
   hero.root.updateMatrixWorld(true); sales.root.updateMatrixWorld(true);
   comp.render();
-  const pr = (v) => { const q = v.clone().project(cam); return [(q.x * 0.5 + 0.5) * W, (-q.y * 0.5 + 0.5) * H]; };
+  const pr = (v) => { const q = v.clone().project(cam); return [(q.x * 0.5 + 0.5) * 1280, (-q.y * 0.5 + 0.5) * 720]; };
   return { hero: pr(headPos(hero)), sales: pr(headPos(sales)), tag: tp ? pr(tp) : null };
 };
 window.ready = true;

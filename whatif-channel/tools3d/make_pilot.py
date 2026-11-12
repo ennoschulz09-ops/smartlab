@@ -135,7 +135,7 @@ specs = [spec(i, times[i]) for i in range(len(times))]
 print(f"{len(times)} Bilder", flush=True)
 if not (REUSE and os.path.exists(os.path.join(FRAMES, "info.json"))):
     sp_json = os.path.join(WORK, "specs.json"); json.dump(specs, open(sp_json, "w")); os.makedirs(FRAMES, exist_ok=True)
-    t0 = time.time(); subprocess.run(["node", os.path.join(HERE, "render.cjs"), sp_json, FRAMES], check=True); print(f"3D fertig in {time.time() - t0:.0f} s", flush=True)
+    t0 = time.time(); subprocess.run(["node", os.path.join(HERE, "render.cjs"), sp_json, FRAMES, "world_pilot.html"], check=True); print(f"3D fertig in {time.time() - t0:.0f} s", flush=True)
 INFO = json.load(open(os.path.join(FRAMES, "info.json")))
 
 
