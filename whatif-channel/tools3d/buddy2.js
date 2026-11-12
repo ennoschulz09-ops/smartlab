@@ -57,8 +57,8 @@ function logoTexture(kind) {
 }
 
 export function makeBuddy2(opt = {}) {
-  const o = Object.assign({ hoodie: 0xff8a2b, pants: 0x2a2530, shoe: 0xf4f4f8, shoeAccent: 0x2fc4b8, skin: 0xf6f1f6, hair: null, hairColor: 0xf6f2f6, headphones: null, cap: null, capBack: true, beanie: null, shades: false, logo: 'dark', bag: false, scale: 1, chain: true }, opt);
-  const root = new THREE.Group(), body = new THREE.Group(); root.add(body); const P = { root, body, legs: [], arms: [] };
+  const o = Object.assign({ hoodie: 0xff8a2b, pants: 0x2a2530, shoe: 0xf4f4f8, shoeAccent: 0x2fc4b8, skin: 0xf6f1f6, hair: null, hairColor: 0xe6e0ea, headphones: null, cap: null, capBack: true, beanie: null, shades: false, logo: 'dark', bag: false, scale: 1, chain: true }, opt);
+  const root = new THREE.Group(), body = new THREE.Group(); const lift = new THREE.Group(); lift.position.y = 0.3; root.add(lift); lift.add(body); const P = { root, body, legs: [], arms: [] };
   // ---- Beine: weite Cargohose, Stulpen, Taschen, Kette; Sneaker
   for (const s of [-1, 1]) {
     const hip = new THREE.Group(); hip.position.set(s * 0.26, 1.05, 0); body.add(hip);
@@ -70,7 +70,7 @@ export function makeBuddy2(opt = {}) {
     const shoe = new THREE.Group(); shoe.position.set(0, -1.12, 0.12); hip.add(shoe);
     const upper = new THREE.Mesh(new THREE.SphereGeometry(0.3, 24, 18), mat(o.shoe, { roughness: 0.55 })); upper.scale.set(0.95, 0.62, 1.55); upper.position.set(0, 0.02, 0.1); upper.castShadow = true; shoe.add(upper);
     const toe = new THREE.Mesh(new THREE.SphereGeometry(0.23, 20, 14), mat(o.shoe, { roughness: 0.5 })); toe.scale.set(1.1, 0.7, 1.0); toe.position.set(0, -0.02, 0.4); shoe.add(toe);
-    const sole = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.11, 1.15), mat(0xf2f2f4, { roughness: 0.6 })); sole.position.set(0, -0.17, 0.15); sole.castShadow = true; shoe.add(sole);
+    const sole = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.09, 1.0), mat(0xf2f2f4, { roughness: 0.6 })); sole.position.set(0, -0.17, 0.15); sole.castShadow = true; shoe.add(sole);
     const acc = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.05, 0.5), mat(o.shoeAccent, { roughness: 0.6 })); acc.position.set(0, -0.095, 0.16); shoe.add(acc);
     for (let k = 0; k < 3; k++) { const lace = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.32, 6), mat(0xffffff)); lace.rotation.z = Math.PI / 2; lace.position.set(0, 0.2 - k * 0.012, 0.0 + k * 0.17); shoe.add(lace); }
     P.legs.push(hip);
@@ -81,7 +81,7 @@ export function makeBuddy2(opt = {}) {
   const hem = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.07, 10, 36), mat(o.hoodie, { roughness: 0.95 })); hem.rotation.x = Math.PI / 2; hem.position.y = 1.08; hem.scale.set(1.12, 0.85, 1); body.add(hem);
   const hoodBack = new THREE.Mesh(new THREE.SphereGeometry(0.42, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.6), mat(o.hoodie, { roughness: 0.92 })); hoodBack.position.set(0, 2.18, -0.22); hoodBack.rotation.x = 0.55; hoodBack.scale.set(1.15, 0.9, 0.9); body.add(hoodBack);
   const collar = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.13, 14, 32), mat(o.hoodie, { roughness: 0.92 })); collar.rotation.x = Math.PI / 2; collar.position.y = 2.17; collar.scale.set(1.05, 0.9, 1); body.add(collar);
-  const pk = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.3, 0.12), mat(o.hoodie, { roughness: 0.95 })); pk.position.set(0, 1.28, 0.5); pk.rotation.x = -0.18; body.add(pk);
+  
   for (const s of [-1, 1]) { const cord = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.5, 8), mat(0xf4efe9)); cord.position.set(s * 0.14, 1.88, 0.55); body.add(cord); const bead = new THREE.Mesh(new THREE.SphereGeometry(0.04, 10, 8), mat(0xf4efe9)); bead.position.set(s * 0.14, 1.62, 0.56); body.add(bead); }
   const logo = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.42), new THREE.MeshBasicMaterial({ map: logoTexture(o.logo), transparent: true, depthWrite: false })); logo.position.set(0, 1.82, 0.585); logo.rotation.x = -0.06; body.add(logo);
   if (o.bag) { const strap = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.5, 0.05), mat(0x221a26)); strap.position.set(-0.05, 1.7, 0.52); strap.rotation.z = -0.5; body.add(strap); const bag = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.4, 0.22), mat(0x221a26, { roughness: 0.5 })); bag.position.set(0.5, 1.2, 0.62); bag.rotation.z = -0.3; body.add(bag); }
@@ -92,10 +92,11 @@ export function makeBuddy2(opt = {}) {
   const face = faceCanvas(); P.face = face;
   const patch = new THREE.Mesh(new THREE.SphereGeometry(0.905, 72, 48, Math.PI / 2 - 65 * Math.PI / 180, 130 * Math.PI / 180, 55 * Math.PI / 180, 85 * Math.PI / 180), new THREE.MeshBasicMaterial({ map: face.tex, transparent: true, depthWrite: false })); patch.scale.set(1, 1.02, 0.97); patch.renderOrder = 2; head.add(patch); drawFace2(face, {});
   // Haare: viele Straehnen (nach hinten/oben, Gesicht frei)
-  if (o.hair) { const hm = mat(o.hairColor, { roughness: 0.55 }); let seed = 7; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
-    const n = o.hair === 'spiky' ? 46 : 34; for (let i = 0; i < n; i++) { const th = (0.08 + rnd() * 0.46) * Math.PI, ph = rnd() * Math.PI * 2; const nx = Math.sin(th) * Math.cos(ph), ny = Math.cos(th), nz = Math.sin(th) * Math.sin(ph);
-      if (nz > 0.25 && th > 0.3 * Math.PI) continue; const len = 0.5 + rnd() * 0.5, rad = 0.12 + rnd() * 0.1; const cone = new THREE.Mesh(new THREE.ConeGeometry(rad, len, 8), hm); cone.castShadow = true;
-      const dir = new THREE.Vector3(nx + (o.hair === 'swoop' ? 0.15 : 0), ny + 0.35, nz - 0.3).normalize(); cone.position.set(nx * 0.86, ny * 0.9, nz * 0.86).add(dir.clone().multiplyScalar(len * 0.42)); cone.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir); head.add(cone); } }
+  if (o.hair) { const hm = mat(o.hairColor, { roughness: 0.6 }); let seed = 11; const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    const base = new THREE.Mesh(new THREE.SphereGeometry(0.93, 40, 24, 0, Math.PI * 2, 0, Math.PI * 0.36), hm); base.rotation.x = -0.35; base.position.set(0, 0.04, -0.06); base.castShadow = true; head.add(base);
+    const n = o.hair === 'spiky' ? 22 : 18; for (let i = 0; i < n; i++) { const th = (0.1 + rnd() * 0.42) * Math.PI, ph = rnd() * Math.PI * 2; const nx = Math.sin(th) * Math.cos(ph), ny = Math.cos(th), nz = Math.sin(th) * Math.sin(ph);
+      if ((nz > 0.2 && th > 0.26 * Math.PI) || (Math.abs(nx) > 0.62 && th > 0.3 * Math.PI)) continue; const r = 0.2 + rnd() * 0.14; const up = o.hair === 'spiky' ? 1.7 : 1.25; const m = sphereAt(r, hm, nx * 0.88, ny * 0.9 + 0.08, nz * 0.88 - 0.05, 1, up, 1); m.lookAt(nx * 3, ny * 3 + 2, nz * 3); m.rotateX(-Math.PI / 2); head.add(m); }
+    if (o.hair === 'swoop') { for (let k = 0; k < 4; k++) { const f = sphereAt(0.22, hm, -0.45 + k * 0.28, 0.88 - k * 0.02, 0.5 - k * 0.04, 1.2, 0.8, 0.9); f.rotation.z = 0.3 - k * 0.12; head.add(f); } } }
   if (o.beanie) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.93, 48, 24, 0, Math.PI * 2, 0, Math.PI * 0.4), mat(o.beanie, { roughness: 0.95 })); b.position.y = 0.05; b.rotation.x = -0.1; head.add(b); const f = new THREE.Mesh(new THREE.TorusGeometry(0.84, 0.11, 12, 40), mat(0xf4ecff, { roughness: 0.95 })); f.rotation.x = Math.PI / 2 - 0.1; f.position.set(0, 0.36, 0.02); head.add(f); const pom = new THREE.Mesh(new THREE.SphereGeometry(0.19, 20, 16), mat(0xf4ecff, { roughness: 0.95 })); pom.position.set(0, 1.0, 0); head.add(pom); P.pom = pom; }
   if (o.cap) { const cp = new THREE.Mesh(new THREE.SphereGeometry(0.95, 48, 24, 0, Math.PI * 2, 0, Math.PI * 0.42), mat(o.cap, { roughness: 0.7 })); cp.position.y = 0.06; cp.rotation.x = -0.15; head.add(cp); const br = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.78, 0.06, 28, 1, false, -Math.PI / 2, Math.PI), mat(o.cap, { roughness: 0.7 })); br.position.set(0, 0.3, o.capBack ? -0.65 : 0.68); br.rotation.set(0.08, o.capBack ? Math.PI : 0, 0); br.scale.set(1, 1, 1.15); head.add(br); }
   if (o.headphones) { const band = new THREE.Mesh(new THREE.TorusGeometry(0.98, 0.05, 10, 40, Math.PI), mat(o.headphones, { roughness: 0.4 })); band.rotation.z = 0; band.position.y = 0.0; head.add(band); for (const s of [-1, 1]) { const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.22, 24), mat(o.headphones, { roughness: 0.35 })); cup.rotation.z = Math.PI / 2; cup.position.set(s * 0.97, 0.0, 0.0); cup.castShadow = true; head.add(cup); const pad = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.06, 24), mat(0x2a2230)); pad.rotation.z = Math.PI / 2; pad.position.set(s * 1.1, 0.0, 0.0); head.add(pad); } }
