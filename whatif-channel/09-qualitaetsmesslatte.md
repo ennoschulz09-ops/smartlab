@@ -1,6 +1,6 @@
 # Qualitäts-Messlatte (vom Kanalbetreiber vorgegeben)
 
-Quelle: vier Bildschirmaufnahmen (je 12 bis 16 s) eines weiteren Beispielvideos ("The First Lie", 16:57, mit Kapitel-Titelkarte) und zwei Figuren-Referenzbilder. Aufnahmen sind nur Studienmaterial und liegen **nicht** im Repository. Die Figurenbilder liegen in `referenz/figuren/` (vom Betreiber zum Speichern übergeben, nicht veröffentlichen).
+Quelle: vier Bildschirmaufnahmen (je 12 bis 16 s) eines weiteren Beispielvideos ("The First Lie", 16:57, mit Kapitel-Titelkarte) und zwei Figuren-Referenzbilder. Aufnahmen sind nur Studienmaterial und liegen **nicht** im Repository. Die Figurenbilder liegen nur lokal in `referenz/figuren/` (vom Betreiber zum Speichern übergeben, per .gitignore ausgeschlossen; das Repository ist öffentlich).
 
 Aussage des Betreibers: "von der Qualität der Videos kannst du dich orientieren, **wie gut alles mindestens aussehen muss**". Das ist die Untergrenze, nicht das Ziel.
 
