@@ -87,7 +87,9 @@ export function makeBuddy2(opt = {}) {
     if (o.chain && s === 1) { for (let k = 0; k < 11; k++) { const a = k / 10; const l = new THREE.Mesh(new THREE.TorusGeometry(0.036, 0.011, 6, 10), mat(0xd6dae4, { metalness: 0.95, roughness: 0.25 })); l.position.set(0.34 + 0.04 * Math.sin(a * 3.14), 0.02 - a * 0.55, 0.2 + 0.07 * Math.sin(a * 3.14)); l.rotation.y = (k % 2) * Math.PI / 2; hip.add(l); } const st = new THREE.Mesh(new THREE.OctahedronGeometry(0.06), mat(0xd6dae4, { metalness: 0.95, roughness: 0.25 })); st.position.set(0.34, -0.55, 0.2); hip.add(st); }
   }
   // ---- Torso (Hoodie): Koerper, Bund, Kapuze, Kordeln, Tasche, Logo
-  const torso = new THREE.Mesh(new THREE.SphereGeometry(0.55, 40, 28), fab(o.hoodie)); torso.scale.set(1.25, 1.2, 0.95); torso.position.y = 1.65; torso.castShadow = true; body.add(torso); P.torso = torso;
+  const tc = new THREE.CatmullRomCurve3([[0.5, -0.58], [0.47, -0.4], [0.44, -0.2], [0.5, 0.0], [0.56, 0.22], [0.53, 0.4], [0.42, 0.52], [0.26, 0.6]].map(([r, y]) => new THREE.Vector3(r, y, 0)));
+  const torsoG = new THREE.LatheGeometry(tc.getPoints(28).map(v => new THREE.Vector2(v.x, v.y)), 40);
+  const torso = new THREE.Mesh(torsoG, fab(o.hoodie)); torso.scale.set(1.25, 1.2, 0.95); torso.position.y = 1.65; torso.castShadow = true; body.add(torso); P.torso = torso;
   const hem = new THREE.Mesh(new THREE.TorusGeometry(0.62, 0.07, 10, 36), fab(o.hoodie)); hem.rotation.x = Math.PI / 2; hem.position.y = 1.08; hem.scale.set(1.12, 0.85, 1); body.add(hem);
   const hoodBack = new THREE.Mesh(new THREE.SphereGeometry(0.42, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.6), fab(o.hoodie)); hoodBack.position.set(0, 2.18, -0.22); hoodBack.rotation.x = 0.55; hoodBack.scale.set(1.15, 0.9, 0.9); body.add(hoodBack);
   const collar = new THREE.Mesh(new THREE.TorusGeometry(0.38, 0.17, 16, 36), fab(o.hoodie)); collar.rotation.x = Math.PI / 2; collar.position.y = 2.17; collar.scale.set(1.05, 0.9, 1); body.add(collar);
