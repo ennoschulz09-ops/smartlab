@@ -1,5 +1,6 @@
 // Figur v2: weisser Kopf mit Haaren, Hoodie mit Logo, Cargohose mit Taschen/Kette, Sneaker, Accessoires, Haende mit Fingern, Gesichts-Bibliothek
 import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 const CW = 1024, CH = 670, PPD = CW / 130;
 export function faceCanvas() { const c = document.createElement('canvas'); c.width = CW; c.height = CH; const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4; return { c, tex }; }
 const ay = (th) => (th - 55) / 85 * CH;
@@ -42,6 +43,15 @@ const fab = (color, o = {}) => new THREE.MeshPhysicalMaterial({ color, roughness
 const mat = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.7, ...o });
 const sphereAt = (r, m, x, y, z, sx = 1, sy = 1, sz = 1) => { const s = new THREE.Mesh(new THREE.SphereGeometry(r, 24, 18), m); s.position.set(x, y, z); s.scale.set(sx, sy, sz); s.castShadow = true; return s; };
 
+
+// Stofffalten: Verschiebung entlang der Normalen (weiche Wuelste) + radiale Rippen
+function puff(geo, amp = 0.05, f = 5, ridge = 0, ridgeN = 7, y0 = 0, y1 = 1) {
+  const p = geo.attributes.position, n = geo.attributes.normal;
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i);
+    let d = amp * (Math.sin(x * f + y * f * 1.3 + 1.7) * Math.sin(z * f * 1.1 + y * f) + 0.5 * Math.sin(y * f * 1.9 + x * 2.3 + z));
+    if (ridge) { const t = Math.min(1, Math.max(0, (y - y0) / (y1 - y0))); d += ridge * t * Math.sin(Math.atan2(x, z) * ridgeN + y * 3); }
+    p.setXYZ(i, x + n.getX(i) * d, y + n.getY(i) * d, z + n.getZ(i) * d); }
+  geo.computeVertexNormals(); return geo; }
 function makeHand(color) {
   const g = new THREE.Group(); const m = mat(color, { roughness: 0.5 });
   g.add(sphereAt(0.2, m, 0, -0.1, 0, 1, 1.1, 0.75));
@@ -67,8 +77,8 @@ export function makeBuddy2(opt = {}) {
   // ---- Beine: weite Cargohose, Stulpen, Taschen, Kette; Sneaker
   for (const s of [-1, 1]) {
     const hip = new THREE.Group(); hip.position.set(s * 0.3, 1.6, 0); body.add(hip);
-    const thigh = new THREE.Mesh(new THREE.CapsuleGeometry(0.3, 0.7, 10, 18), fab(o.pants)); thigh.position.y = -0.5; thigh.scale.set(1.12, 1, 1.08); thigh.castShadow = true; hip.add(thigh);
-    const shin = new THREE.Mesh(new THREE.CylinderGeometry(0.29, 0.44, 0.95, 20), fab(o.pants)); shin.position.y = -1.08; shin.castShadow = true; hip.add(shin);
+    const thigh = new THREE.Mesh(puff(new THREE.CapsuleGeometry(0.3, 0.7, 14, 32), 0.03, 5), fab(o.pants)); thigh.position.y = -0.5; thigh.scale.set(1.12, 1, 1.08); thigh.castShadow = true; hip.add(thigh);
+    const shin = new THREE.Mesh(puff(new THREE.CylinderGeometry(0.29, 0.44, 0.95, 40, 24), 0.03, 5, 0.05, 8, 0.0, -0.5), fab(o.pants)); shin.position.y = -1.08; shin.geometry.translate(0, 0, 0); shin.castShadow = true; hip.add(shin);
     for (const [y, r] of [[-1.5, 0.44]]) { const fold = new THREE.Mesh(new THREE.TorusGeometry(r, 0.035, 8, 28), fab(o.pants)); fold.rotation.x = Math.PI / 2; fold.position.y = y; fold.scale.set(1, 1, 1.05); hip.add(fold); }
     const pocket = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.38, 0.34), fab(o.pants)); pocket.position.set(s * 0.32, -0.62, 0.02); hip.add(pocket);
     const flap = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.12, 0.36), fab(o.pants)); flap.position.set(s * 0.33, -0.42, 0.02); hip.add(flap);
@@ -89,7 +99,7 @@ export function makeBuddy2(opt = {}) {
   const up = new THREE.Group(); up.position.y = 0.55; body.add(up);
   // ---- Torso (Hoodie): Koerper, Bund, Kapuze, Kordeln, Tasche, Logo
   const tc = new THREE.CatmullRomCurve3([[0.5, -0.58], [0.47, -0.4], [0.44, -0.2], [0.5, 0.0], [0.56, 0.22], [0.53, 0.4], [0.42, 0.52], [0.26, 0.6]].map(([r, y]) => new THREE.Vector3(r, y, 0)));
-  const torsoG = new THREE.LatheGeometry(tc.getPoints(28).map(v => new THREE.Vector2(v.x, v.y)), 40);
+  const torsoG = puff(new THREE.LatheGeometry(tc.getPoints(44).map(v => new THREE.Vector2(v.x, v.y)), 64), 0.035, 6);
   const torso = new THREE.Mesh(torsoG, fab(o.hoodie)); torso.scale.set(1.4, 1.2, 0.95); torso.position.y = 1.65; torso.castShadow = true; up.add(torso); P.torso = torso; P.torsoS = [1.4, 1.2, 0.95];
   const hoodBack = new THREE.Mesh(new THREE.SphereGeometry(0.42, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.6), fab(o.hoodie)); hoodBack.position.set(0, 2.18, -0.22); hoodBack.rotation.x = 0.55; hoodBack.scale.set(1.15, 0.9, 0.9); up.add(hoodBack);
   const collar = new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.22, 18, 40), fab(o.hoodie)); collar.rotation.x = Math.PI / 2 - 0.25; collar.position.y = 2.1; collar.position.z = 0.06; collar.scale.set(1.05, 0.9, 1); up.add(collar);
@@ -124,12 +134,14 @@ export function makeBuddy2(opt = {}) {
   for (const s of [-1, 1]) {
     const sh = new THREE.Group(); sh.position.set(s * 0.86, 2.0, 0); up.add(sh);
     sh.add(sphereAt(0.2, fab(o.hoodie), 0, 0, 0));
-    const uarm = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 0.46, 8, 14), fab(o.hoodie)); uarm.position.y = -0.4; uarm.scale.y = 1.25; uarm.castShadow = true; sh.add(uarm);
+    const uarm = new THREE.Mesh(puff(new THREE.CapsuleGeometry(0.2, 0.46, 12, 24), 0.03, 7), fab(o.hoodie)); uarm.position.y = -0.4; uarm.scale.y = 1.25; uarm.castShadow = true; sh.add(uarm);
     const el = new THREE.Group(); el.position.y = -0.84; sh.add(el); el.add(sphereAt(0.17, fab(o.hoodie), 0, 0, 0));
-    const lo = new THREE.Mesh(new THREE.CapsuleGeometry(0.19, 0.5, 8, 14), fab(o.hoodie)); lo.position.y = -0.36; lo.castShadow = true; el.add(lo);
+    const lo = new THREE.Mesh(puff(new THREE.CapsuleGeometry(0.19, 0.5, 12, 24), 0.035, 7), fab(o.hoodie)); lo.position.y = -0.36; lo.castShadow = true; el.add(lo);
     const cuff = new THREE.Mesh(new THREE.TorusGeometry(0.19, 0.055, 10, 24), fab(o.hoodie)); cuff.rotation.x = Math.PI / 2; cuff.position.y = -0.68; el.add(cuff);
     const hand = makeHand(0xf6f1f6); hand.position.y = -0.78; el.add(hand); P.arms.push({ sh, el, hand }); handPose(hand, 'relaxed');
   }
+  const sc = document.createElement('canvas'); sc.width = sc.height = 128; { const g = sc.getContext('2d'); const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(20,10,40,0.55)'); gr.addColorStop(0.6, 'rgba(20,10,40,0.25)'); gr.addColorStop(1, 'rgba(20,10,40,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); }
+  const blob = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.8), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false })); blob.rotation.x = -Math.PI / 2; blob.position.y = 0.02; blob.renderOrder = 1; root.add(blob);
   root.scale.setScalar(o.scale); return P;
 }
 
