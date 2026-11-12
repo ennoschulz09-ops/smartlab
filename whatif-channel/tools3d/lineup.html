@@ -13,8 +13,8 @@ const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffe
 const scene = new THREE.Scene(); scene.background = new THREE.Color(0x8a4f9a); scene.fog = new THREE.Fog(0xc98fb8, 20, 70);
 scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(), 0.04).texture;
 const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 150);
-scene.add(new THREE.HemisphereLight(0xc9a8ff, 0x7a4a8c, 1.0));
-const key = new THREE.DirectionalLight(0xffa860, 2.6); key.position.set(-8, 6, -8); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, { left: -12, right: 12, top: 10, bottom: -6, near: 1, far: 40 }); scene.add(key);
+scene.add(new THREE.HemisphereLight(0xc9a8ff, 0x7a4a8c, 0.55));
+const key = new THREE.DirectionalLight(0xffa860, 3.4); key.position.set(-8, 6, -8); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); Object.assign(key.shadow.camera, { left: -12, right: 12, top: 10, bottom: -6, near: 1, far: 40 }); scene.add(key);
 const fill = new THREE.DirectionalLight(0xffd0e8, 1.1); fill.position.set(2, 3, 12); scene.add(fill); const rim = new THREE.DirectionalLight(0xff6fb0, 1.4); rim.position.set(7, 4, -6); scene.add(rim);
 const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x6a5a78, roughness: 0.85 })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
 const wallC = document.createElement('canvas'); wallC.width = 512; wallC.height = 256; { const g = wallC.getContext('2d'); g.fillStyle = '#8f8a9a'; g.fillRect(0, 0, 512, 256); for (let i = 0; i < 900; i++) { g.fillStyle = `rgba(${60 + Math.random() * 80},${55 + Math.random() * 70},${80 + Math.random() * 70},.12)`; g.fillRect(Math.random() * 512, Math.random() * 256, 4 + Math.random() * 12, 3 + Math.random() * 8); } g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 5; g.lineJoin = 'round'; g.beginPath(); g.moveTo(80, 190); g.lineTo(100, 110); g.lineTo(130, 150); g.lineTo(160, 100); g.lineTo(190, 150); g.lineTo(220, 110); g.lineTo(235, 190); g.closePath(); g.stroke(); }
@@ -34,13 +34,14 @@ const cast = [
   makeBuddy2({ hoodie: 0xe8e0d8, pants: 0x1f1822, cap: 0x14101a, bag: true, shoe: 0xf2f2f4, shoeAccent: 0xc8c8d0, logo: 'dark' }),
 ];
 const X = [-7.2, -3.6, 0, 3.6, 7.2]; cast.forEach((c, i) => { c.root.position.set(X[i], 0, 0); c.root.rotation.y = [0.35, 0.18, 0, -0.18, -0.3][i]; scene.add(c.root); });
-const arms = (c, a) => { c.arms[0].sh.rotation.set(...a[0].sh); c.arms[0].el.rotation.set(...a[0].el); c.arms[1].sh.rotation.set(...a[1].sh); c.arms[1].el.rotation.set(...a[1].el); };
-// Posen (angelehnt an das Referenzbild)
-arms(cast[0], [{ sh: [-0.9, 0, 0.9], el: [-1.7, 0, -0.2] }, { sh: [-0.9, 0, -0.9], el: [-1.7, 0, 0.2] }]); handPose(cast[0].arms[0].hand, 'fist'); handPose(cast[0].arms[1].hand, 'fist'); drawFace2(cast[0].face, { eye: ['smug', 'smug'], mouth: 'flat', brow: [14, 14] });
-arms(cast[1], [{ sh: [0.0, 0, 0.2], el: [-0.2, 0, 0] }, { sh: [-0.4, 0, -2.6], el: [-0.2, 0, 0.6] }]); handPose(cast[1].arms[1].hand, 'peace'); cast[1].legs[1].rotation.x = -0.9; cast[1].legs[1].rotation.z = -0.1; drawFace2(cast[1].face, { eye: ['happy', 'happy'], mouth: 'laugh' });
-arms(cast[2], [{ sh: [0.2, 0, 0.35], el: [-1.0, 0, 0.3] }, { sh: [0.2, 0, -0.35], el: [-1.0, 0, -0.3] }]); handPose(cast[2].arms[0].hand, 'relaxed'); handPose(cast[2].arms[1].hand, 'relaxed'); drawFace2(cast[2].face, { eye: ['dot', 'dot'], mouth: 'smile' });
-arms(cast[3], [{ sh: [-0.9, 0, 0.7], el: [-1.9, 0, -0.1] }, { sh: [-0.9, 0, -0.7], el: [-1.9, 0, 0.1] }]); handPose(cast[3].arms[0].hand, 'fist'); handPose(cast[3].arms[1].hand, 'fist'); drawFace2(cast[3].face, { eye: ['dot', 'dot'], mouth: 'flat' });
-arms(cast[4], [{ sh: [-0.4, 0, 2.5], el: [-0.2, 0, -0.6] }, { sh: [-0.4, 0, -2.5], el: [-0.2, 0, 0.6] }]); handPose(cast[4].arms[0].hand, 'peace'); handPose(cast[4].arms[1].hand, 'peace'); drawFace2(cast[4].face, { eye: ['dot', 'wink'], mouth: 'laugh' });
+import { setPose } from './buddy2.js';
+setPose(cast[0], 'cross'); drawFace2(cast[0].face, { eye: ['smug', 'smug'], mouth: 'flat', brow: [14, 14] });
+setPose(cast[1], 'peaceR'); cast[1].legs[1].rotation.x = -0.9; drawFace2(cast[1].face, { eye: ['happy', 'happy'], mouth: 'laugh' });
+setPose(cast[2], 'pocket'); drawFace2(cast[2].face, { eye: ['dot', 'dot'], mouth: 'smile' });
+setPose(cast[3], 'cross'); drawFace2(cast[3].face, { eye: ['dot', 'dot'], mouth: 'flat' });
+setPose(cast[4], 'peaceBoth'); drawFace2(cast[4].face, { eye: ['dot', 'wink'], mouth: 'laugh' });
 cast[1].root.position.y = 0.0;
-window.renderFrame = (s) => { if (s.i === 2) { cam.position.set(-1.5, 3.6, 7.5); cam.lookAt(-1.8, 3.3, 0); bokeh.uniforms.focus.value = 7.5; } else if (s.i === 3) { cam.position.set(1.8, 0.8, 8); cam.lookAt(1.8, 0.8, 0); bokeh.uniforms.focus.value = 8; } else { cam.position.set(0.2, 1.7, 15.5); cam.lookAt(0, 2.5, 0); bokeh.uniforms.focus.value = 15.5; } comp.render(); return {}; }; window.ready = true;
+const Q2 = new URLSearchParams(location.search); const solo = Q2.get('solo');
+if (solo) { cast.forEach((c, i) => c.root.visible = i === 2); scene.traverse(o => { if (o !== scene && o.isMesh && !cast.some(c => c.root.getObjectById(o.id)) && o !== ground) o.visible = false; }); scene.background = new THREE.Color(0xa89ab8); scene.fog = null; cast[2].root.position.set(0, 0, 0); cast[2].root.rotation.y = 0; }
+window.renderFrame = (s) => { if (solo) { const bb = new THREE.Box3().setFromObject(cast[2].root); const hgt = bb.max.y - bb.min.y; const d = hgt / 2 / Math.tan(15 * Math.PI / 180) * 1.1; cam.position.set(0, bb.min.y + hgt / 2, d); cam.lookAt(0, bb.min.y + hgt / 2, 0); bokeh.uniforms.focus.value = d; comp.render(); return {}; } if (s.i === 2) { cam.position.set(-1.5, 3.6, 7.5); cam.lookAt(-1.8, 3.3, 0); bokeh.uniforms.focus.value = 7.5; } else if (s.i === 3) { cam.position.set(1.8, 0.8, 8); cam.lookAt(1.8, 0.8, 0); bokeh.uniforms.focus.value = 8; } else { cam.position.set(0.2, 1.7, 15.5); cam.lookAt(0, 2.5, 0); bokeh.uniforms.focus.value = 15.5; } comp.render(); return {}; }; window.ready = true;
 </script></body></html>
