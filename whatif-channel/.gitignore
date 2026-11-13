@@ -1,2 +1,4 @@
 # Fremdes Referenzmaterial: nur lokal, nicht veroeffentlichen
 referenz/
+__pycache__/
+*.pyc
