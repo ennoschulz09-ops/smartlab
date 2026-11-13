@@ -32,6 +32,9 @@ for ang, k in PICK.items():
         w = (~m).astype(np.float32)
         for c in range(3):
             num = ndi.gaussian_filter(rgb[..., c] * w, 6); den = ndi.gaussian_filter(w, 6) + 1e-4; rgb[..., c] = np.where(m, num / den, rgb[..., c])
+    core = ndi.binary_erosion(a > 0.5, structure=np.ones((3, 3)), iterations=3)
+    _, (iy, ix) = ndi.distance_transform_edt(~core, return_indices=True)
+    rgb = rgb[iy, ix]; a = ndi.gaussian_filter(core.astype(np.float32), 1.1)
     h = rgb.shape[0]; H = 700; s = H / h
     out = Image.fromarray(np.dstack([rgb.astype(np.uint8), (a * 255).astype(np.uint8)])).resize((int(rgb.shape[1] * s), H), Image.LANCZOS)
     arr = np.array(out); ys, xs = np.where(arr[..., 3] > 128); lowrows = ys > ys.max() - 25

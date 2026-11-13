@@ -275,7 +275,7 @@ def stage(i, t):
     if bg.size != (W, H): bg = bg.resize((W, H), Image.BICUBIC)
     canvas = Image.fromarray(grade_np(np.array(bg))).convert("RGBA")
     P, S = actors(t); Wk = [walker(w, t) for w in WALK]
-    items = [("walk", k, w) for k, w in enumerate(Wk)] + [("sales", 0, S), ("pip", 0, P)]
+    items = [("walk", k, w) for k, w in enumerate(Wk)] + ([("sales", 0, S)] if t < B["n6"][0] - 0.1 else []) + [("pip", 0, P)]
     idx = {"pip": 0, "sales": 1}; heads = {}
     order = sorted(items, key=lambda it: -inf[(2 + it[1]) if it[0] == "walk" else idx[it[0]]]["d"])
     for kind, k, st in order:
@@ -286,6 +286,7 @@ def stage(i, t):
         sset = SETS["walk"][k] if kind == "walk" else SETS[kind]
         res = PU.draw(canvas, sset, foot, ppx, fv, cxz, hop=st["hop"], sx=st["sx"], sy=st["sy"], tilt=st["tilt"], dx=st["dx"] * ppx, fig_h=fig, shadow=0.5 if kind != "walk" else 0.3)
         if kind != "walk": heads[kind] = res
+    heads.setdefault("sales", dict(head=(-999, -999), foot=(-999, -999), ph=1))
     return canvas, heads, P, S
 
 

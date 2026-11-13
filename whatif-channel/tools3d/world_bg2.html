@@ -254,7 +254,7 @@ const CAMS = {
 
 // Nur Hintergrund: Kamera kommt aus s.cam, Figuren werden als Sprites in Python eingesetzt; zurueck: Projektion der Bodenpunkte
 window.renderFrame = (s) => {
-  hero.root.visible = false; sales.root.visible = false; peds.forEach(p => p.root.visible = false); board.visible = false; paper.visible = false;
+  hero.root.visible = false; sales.root.visible = false; tag.visible = false; rings.forEach(r => r.visible = false); tagGlow.intensity = 0; peds.forEach(p => p.root.visible = false); board.visible = false; paper.visible = false;
   mainCar.position.set(2.8, 0, 0.1); mainCar.rotation.y = Math.PI;
   const c = s.cam; cam.position.set(...c.pos); cam.fov = c.fov || 36; cam.updateProjectionMatrix(); cam.lookAt(...c.look); cam.rotateZ(c.roll || 0); cam.updateMatrixWorld(true);
   key.position.set(-10, 7, -12); key.target.position.set(c.look[0], 0, 2); fill.position.set(c.look[0] - 2, 3, 14); rim.position.set(c.look[0] + 8, 5, -8);
